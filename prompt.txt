@@ -1,0 +1,217 @@
+Hola, necesito que hagas los siguientes cambios. Pero por lo mientras te comparto el contexto necesario para la elbaoración de los cambios.
+Hemos ido con nuestro profesor para la revisión de TT. De hecho, no pudimos enseñarle un avance significativo debido a que el prototipo (este proyecto) tenía pocas coincidencias con lo que él nos pidió.
+El sistema que el profesor requiere contiene las siguientes características:
+1. El sistema es capaz de cargar la base de datos del equipo local del usuario a partir de sus claves de MySQL. Justamente debe ser MySQL debido a que se deben extraer tablas, diccionarios y demás cosas que te especificaremos más adelante; por ende, el usuario debe nevagar en su terminal de MySQL usando sus claves locales, y seleccionar alguna base de datos que presente, pero queremos que la implementación sea automática. Que con bsae en la información del usuario, le muestre la sbases de datos que tiene almacenadas localmente, por lo que la integración debe ser mas profunda.
+2. El sistema debe ser capaz de mostrar el diccionario de las tablas implicadas en la base de datos que el alumno seleccione.
+3. El sistema debe ser capaz de tokenizar cada uno de los elementos de la gramática para mostrárselos al usuario en el proceso de traducciṕon de álgebra relacional al lenguaje SQL.
+4. Debe generar el árbol de sintaxis y la sentencia SQL correspondiente (eso ya lo hace pero debes agregar más operadores como los descritos en el audio, se me viene a la mente las funciones trigonométricas y comparadores de signos (por ejemplo edad > 5, en donde el comparador es '>'))
+5. Mantén la vista que tenemos por ahora, pero para esta primera versión DEBES ELIMINAR LA FUNCIONALIDAD DE VISUALIZACIÓN DE DIAGRAMA E-R Y MODELO RELACIONAL, ESO SERÁ PARA TT-2, el cual se entregará el siguiente semestre.
+6. Como lo aplicamos anteriormente, algunas relaciones pueden ser recursivas: una estar dentro de otra y eso es pieza importante de la funcionalidad del sistema (que nuestro analizador funcione hasta en las expresiones más complejas siempre y cuando obedezcan al lenguaje del álgebra relacional correctamente).
+7. En caso de existir algún error por parte del usaurio al ingresar la expresión inicial, descríbelo catalogando el error a partir de la violación sintáctica establecida (no me acuerdo cómo se llama el archivo jeje).
+8. Elimina los archivos de las bases de datos que tiene el sistema actualmente.
+9. Agrega los demás operadores como botón para que el usuario los ingrese de manera más ágil al ingresar su expresión. Coloca en los botones y trabaja meramente con los símbolos, y no con los nombres de los operadores (a menos a que así lo amerite el propio operador, o sea, que dicho operador no tenga simbolo).
+10. Evita para esta primera parte la generación de diagramas E-R y modelos relacionales. No obstante, cuando se muestre el diccionario de tablas, el usuario al hacer clci sobre una de éstas puede ver el contenido de las mismas, esto es de mayor importancia cuando se trabaja con tablas que contienen datos reales.
+11. A continuación, te comparto la información que el profesor nos compartió (código):
+DefExpRegLexi.flex:
+package algebrarelacional;
+import java_cup.runtime.*;
+import java.io.Reader;
+%%  /* inicio de declaraciones JFlex  */
+%class LexicAlgRel
+%line      /* Se habilita elcontador de lineas. Variable yyline, de tipo integer  */
+%column    /* Se habilita el contado de columnas. Variable yycolumn, de tipo integer */
+%char      /* Se habilita el contador de caracteres. Variable yychar, de tipo long  */
+%cup    /* Se habilita la compatibilidad con java cup   */
+
+ /* el código entre %{ y %} se copia tal cual dentro de la clase del analizador léxico */
+%{
+      public int TipSimb;
+ /* Se crean los objetos Symbol para ser utilizados durante la sintésis de los atributos 
+    Symbol está especificado en java.cup.Symbol */
+  private Symbol symbol(int type){
+    return new Symbol(type, yyline, yycolumn);
+  }
+  private Symbol symbol(int type, Object value){
+    return new Symbol(type,yyline, yycolumn, value);
+  }
+
+%}
+
+/* hacemos algunas definiciones regulares, o macro definiciones */
+Letra=[a-zA-Z]
+Digito=[0-9]
+%%  /* Ahora van las expresione regulares */
+[ \t\n]+                      { ;}
+";"                         {   return symbol(SintacAlgRelSym.SEMIC); }
+{Digito}+(\.{Digito}+)?     {   
+                                return  symbol(SintacAlgRelSym.NUM);
+                            }  
+"&&"                        {  return symbol(SintacAlgRelSym.AND); }
+"||"                        {  return symbol(SintacAlgRelSym.OR); }
+"!"                        {  return symbol(SintacAlgRelSym.NOT); }
+">="                        {  return symbol(SintacAlgRelSym.GE); }
+">"                         {  return symbol(SintacAlgRelSym.GT); }
+"<="                        {  return symbol(SintacAlgRelSym.LE); }
+"<"                         {  return symbol(SintacAlgRelSym.LT); }
+"=="                        {  return symbol(SintacAlgRelSym.EQ); }
+"!="                         { return symbol(SintacAlgRelSym.NE); }
+"/"                         {  return symbol(SintacAlgRelSym.OpDiv); } 
+"*"                         {  return symbol(SintacAlgRelSym.OpProd); }
+"-"                         {  return symbol(SintacAlgRelSym.OpResta); }
+"+"                         {  return symbol(SintacAlgRelSym.OpSuma); }
+"("                         {  return symbol(SintacAlgRelSym.ParIzq); }
+")"                         {  return symbol(SintacAlgRelSym.ParDer); }
+"^"                         {  return symbol(SintacAlgRelSym.OpPotencia); }
+","                         {   return symbol(SintacAlgRelSym.COMA); }
+"<-"                        {   return symbol(SintacAlgRelSym.OpAsig); }
+"SELEC"                     {  return symbol(SintacAlgRelSym.SELEC); }
+"PROY"                      {  return symbol(SintacAlgRelSym.PROY); }  
+"JOIN"                      {  return symbol(SintacAlgRelSym.JOIN); }
+"PRODCART"                  {  return symbol(SintacAlgRelSym.PRODCART); }
+"UNION"                     {  return symbol(SintacAlgRelSym.UNION); }
+"INTERSEC"                  {  return symbol(SintacAlgRelSym.INTERSEC); }
+"DIF"                       {  return symbol(SintacAlgRelSym.DIF); }
+"AGRUPAR"                   {  return symbol(SintacAlgRelSym.AGRUPAR);}
+"SUM"                       {  return symbol(SintacAlgRelSym.SUM); }
+"PROM"                      {  return symbol(SintacAlgRelSym.PROM); }
+"MAX"                       {  return symbol(SintacAlgRelSym.MAX); }
+"MIN"                       {  return symbol(SintacAlgRelSym.MIN); }
+"COUNT"                     {  return symbol(SintacAlgRelSym.COUNT); }
+({Letra}({Letra}|{Digito})*)"."({Letra}({Letra}|{Digito})*)  {
+                               return symbol(SintacAlgRelSym.ATRIBUTO);
+                            }
+{Letra}({Letra}|{Digito})*  {   
+                               return symbol(SintacAlgRelSym.TABLA);
+                            }
+
+. { return symbol(SintacAlgRelSym.error);}
+
+GramAlgRel.cup:
+package algebrarelacional;
+import java_cup.runtime.*;
+import java.io.FileReader;
+
+class SintacAlgRel;
+
+       
+  
+parser code {:
+    
+    public void report_error(String mensaje,Object info){
+        StringBuilder m = new StringBuilder("Error");
+        if(info instanceof java_cup.runtime.Symbol){
+            java_cup.runtime.Symbol s = (java_cup.runtime.Symbol) info;
+            if(s.left >=0){
+                m.append(" en la linea " + (s.left+1));
+                if(s.right>=0)
+                    m.append(", columna " + (s.right+1));
+            }
+        }
+        m.append("  : " + mensaje);
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info){
+        report_error(message, info);
+        //System.exit(1);
+    }
+
+:}
+
+
+terminal OpSuma, OpResta, OpProd, OpDiv, OpAsig, OpPotencia;
+terminal ParIzq, ParDer, SEMIC, COMA;
+terminal  NUM;
+terminal  SUM, PROM, MAX, MIN, COUNT ;
+terminal  ATRIBUTO;
+terminal  CONST_PRED;  /* PI, E, PHI, RAD, etc */
+terminal  BLTIN;  /* sin, cos, tan, asin, acos, atan */  
+terminal UMINUS;
+terminal OR, AND, GT, GE, LT, LE, EQ, NE, NOT; 
+terminal SELEC,PROY ,IDENT ,UNION ,INTERSEC; 
+terminal DIF,JOIN ,PRODCART,AGRUPAR;
+terminal TABLA, VISTA, RelGuardada;
+
+
+non terminal  ListExprAlgRel; 
+non terminal Relacion, Condicion,ListaAtributos ;
+non terminal ListaFuncAgreg, FuncAgreg;
+non terminal  expr_bool, expr;
+ 
+
+/* Precedences */
+precedence right OpAsig;
+precedence left OR;
+precedence left AND;
+precedence left GT, GE, LT, LE, EQ, NE;
+precedence left OpSuma, OpResta;
+precedence left OpProd, OpDiv;
+precedence left UMINUS, NOT;
+precedence right OpPotencia;
+
+ListExprAlgRel    ::=  Relacion   
+        | ListExprAlgRel Relacion     
+        ;
+Relacion ::= SELEC ParIzq Condicion COMA Relacion ParDer
+        | PROY ParIzq ListaAtributos SEMIC Relacion ParDer
+        | IDENT OpAsig Relacion
+        | UNION ParIzq Relacion COMA Relacion ParDer
+        | INTERSEC ParIzq Relacion COMA Relacion ParDer
+        | DIF ParIzq Relacion COMA Relacion ParDer
+        | JOIN ParIzq Relacion COMA Relacion COMA Condicion ParDer
+        | PRODCART ParIzq Relacion COMA Relacion ParDer
+        | AGRUPAR ParIzq ListaAtributos SEMIC ListaFuncAgreg SEMIC Relacion ParDer
+        | TABLA
+        | VISTA
+        | RelGuardada
+        ;
+Condicion ::= expr_bool OR expr_bool
+        |  expr_bool AND expr_bool
+        |  NOT expr_bool
+        |  expr_bool
+        ;
+expr_bool ::= expr GT expr
+        | expr GE expr
+        | expr LT expr
+        | expr LE expr
+        | expr EQ expr
+        | expr NE expr
+        | ParIzq expr_bool ParDer
+        ;
+expr ::= expr OpSuma expr
+        | expr OpResta expr
+        | expr OpProd expr
+        | expr OpDiv expr
+        | OpResta expr  %prec UMINUS
+        | expr OpPotencia expr
+        | NUM
+        | CONST_PRED
+        | ATRIBUTO
+        | ParIzq expr ParDer
+        ;
+ListaAtributos ::= ATRIBUTO
+        | ListaAtributos COMA ATRIBUTO
+        ;
+ListaFuncAgreg ::= FuncAgreg
+        | ListaFuncAgreg COMA FuncAgreg
+        ;
+FuncAgreg ::= SUM ParIzq ATRIBUTO ParDer
+        | PROM ParIzq ATRIBUTO ParDer
+        | MAX ParIzq ATRIBUTO ParDer
+        | MIN ParIzq ATRIBUTO ParDer
+        | COUNT ParIzq ATRIBUTO ParDer
+        ;
+
+//Puedes hacer ciertas mejoras ligeros en estos documentos en caso de necesitarlos, debes incluirlos en la parte funcional del proyecto. Como te puedes dar cuenta, estos archivos forman parte del analizador léxico y sintáctico.
+
+12. Este es el mensaje que el profesor nos envió posteriormente para atender el uso de algunas tecnologías que sí o sí debes de hacer: 
+Respecto al analizador léxico, tambien investiguen y aprendan a utlizar : Monaco Editor o CodeMirror, con esas herramientas se hará que el editor despliegue tooltip’s cuando el cursor esté sobre una de las palabras o símbolos que representen una operación relacional.
+
+Posteriormente se sustituirán las palabras por los símbolos griegos que representan las operaciones, para esto solo hay que poner en JFlex que se usarán códigos unicode en lugar de los códigos ascii.
+
+Por favor avancen para tener el editor terminado para la primer revisión.
+
+Atentamente
+Andrés Ortigoza Campos
+
+13. Creo que ya no hay nada que agregar por ahora. Concéntrate en cumplir con los objetivos propuestos. Tú puedes. Cuando termines avisame para desplegar el proyecto y hacer pruebas. En lo que tú trabajas esto, yo instalaré y configuraré MySQL en mi equipo local y crearé algunas BD de prueba. Gracias.

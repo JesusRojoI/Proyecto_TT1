@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TT1 - Álgebra Relacional a SQL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Roboto+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+    <link rel="stylesheet" href="/css/app.v4.css">
+</head>
+<body class="bg-slate-100 min-h-screen pb-20">
+
+    <header class="bg-slate-800 text-white py-6 shadow-md relative">
+        <div class="container mx-auto max-w-7xl px-6 text-center">
+            <h1 class="text-2xl font-bold tracking-tight">Sistema de Apoyo para la Ense&ntilde;anza del &Aacute;lgebra Relacional</h1>
+            <p class="text-sm text-slate-300 mt-1">IPN &middot; ESCOM &middot; Trabajo Terminal 2027-A159</p>
+        </div>
+        <a href="/presentacion.html" class="absolute top-1/2 -translate-y-1/2 right-6 text-sm text-slate-300 hover:text-white border border-slate-600 hover:border-slate-400 px-3 py-1.5 rounded-sm transition flex items-center gap-1">
+            <i class="bi bi-info-circle"></i> Acerca de
+        </a>
+    </header>
+
+    <main class="container mx-auto p-6 max-w-7xl">
+
+        <!-- ================= Conexion a MySQL ================= -->
+        <section class="bg-white rounded shadow-sm border border-slate-200 p-5 mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                    <i class="bi bi-server text-blue-800"></i> Conexión a MySQL local
+                </h2>
+                <span id="connectionBadge" class="hidden text-xs font-semibold px-2 py-1 rounded-sm bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <i class="bi bi-check-circle"></i> Conectado
+                </span>
+            </div>
+
+            <div id="connectionForm" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                <div class="md:col-span-3">
+                    <label for="connHost" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Host</label>
+                    <input id="connHost" value="localhost" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="connPort" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Puerto</label>
+                    <input id="connPort" value="3306" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                </div>
+                <div class="md:col-span-3">
+                    <label for="connUser" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Usuario</label>
+                    <input id="connUser" value="root" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="connPassword" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Contraseña</label>
+                    <input id="connPassword" type="password" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                </div>
+                <div class="md:col-span-2">
+                    <button id="connectBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-sm font-medium py-2 px-4 rounded-sm border border-blue-900 transition">
+                        <i class="bi bi-plug"></i> Conectar
+                    </button>
+                </div>
+                <div class="md:col-span-12">
+                    <p id="connectionMessage" class="text-xs text-slate-500">Ingresa tus claves locales de MySQL para cargar tus bases de datos.</p>
+                </div>
+            </div>
+
+            <div id="connectionInfo" class="hidden">
+                <div class="flex flex-wrap items-end gap-3">
+                    <div class="flex-1 min-w-[220px]">
+                        <p class="text-xs text-slate-500 mb-1" id="connSummary"></p>
+                        <label for="databaseSelect" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                            <i class="bi bi-database"></i> Base de datos
+                        </label>
+                        <select id="databaseSelect" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700"></select>
+                    </div>
+                    <button id="openDictionaryBtn" class="text-sm font-medium text-blue-900 hover:text-white hover:bg-blue-900 border border-blue-900 px-3 py-2 rounded-sm transition flex items-center gap-1">
+                        <i class="bi bi-journal-text"></i> Ver diccionario de datos
+                    </button>
+                    <button id="disconnectBtn" class="text-sm font-medium text-slate-600 hover:text-white hover:bg-slate-600 border border-slate-400 px-3 py-2 rounded-sm transition flex items-center gap-1">
+                        <i class="bi bi-box-arrow-right"></i> Desconectar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- ================= Editor ================= -->
+            <div class="bg-white rounded shadow-sm border border-slate-200 p-6">
+                <h2 class="text-base font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                    <i class="bi bi-input-cursor-text text-blue-800"></i>
+                    Expresi&oacute;n de &Aacute;lgebra Relacional
+                </h2>
+
+                <div id="editorContainer" class="editor-container"></div>
+
+                <div class="flex flex-wrap justify-end gap-2 mt-3">
+                    <button id="translateBtn" class="bg-blue-900 hover:bg-blue-800 text-white text-sm font-medium py-2 px-4 rounded-sm border border-blue-900 transition">
+                        <i class="bi bi-play-fill"></i> Traducir y ejecutar
+                    </button>
+                    <button id="saveBtn" class="bg-emerald-800 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-sm border border-emerald-800 transition">
+                        <i class="bi bi-save"></i> Guardar @n
+                    </button>
+                    <button id="clearHistoryBtn" class="bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium py-2 px-3 rounded-sm border border-slate-600 transition">
+                        <i class="bi bi-eraser"></i> Limpiar historial
+                    </button>
+                </div>
+
+                <div class="mt-5">
+                    <p class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
+                        Operadores (haz clic para insertar)
+                    </p>
+                    <div id="operatorsPanel" class="operators-panel"></div>
+                </div>
+
+                <div class="mt-5">
+                    <label for="exampleSelect" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Ejemplos generados desde tu base de datos</label>
+                    <select id="exampleSelect" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                        <option value="">-- Selecciona un ejemplo --</option>
+                    </select>
+                </div>
+
+                <div class="mt-5 p-3 border border-blue-200 bg-blue-50 rounded-sm">
+                    <p class="text-xs font-semibold text-blue-900 uppercase tracking-wider mb-1">Sentencia SQL completa</p>
+                    <pre id="expandedOutput" class="text-sm text-blue-950 whitespace-pre-wrap break-words">--</pre>
+                </div>
+
+                <div class="mt-3 text-xs text-slate-600">
+                    <span class="font-semibold uppercase tracking-wider">Historial activo:</span>
+                    <span id="historyKeys" class="text-blue-900 ml-1">vacío</span>
+                </div>
+            </div>
+
+            <!-- ================= Resultados ================= -->
+            <div class="bg-white rounded shadow-sm border border-slate-200 p-6">
+                <h2 class="text-base font-semibold text-slate-700 mb-3">Proceso de traducci&oacute;n</h2>
+
+                <div id="errorBox" class="hidden mb-4 p-3 border border-red-300 bg-red-50 rounded-sm text-sm text-red-800"></div>
+
+                <div class="mb-4">
+                    <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
+                        <i class="bi bi-signpost-split"></i> Tokenizaci&oacute;n
+                    </h3>
+                    <div id="tokensContainer" class="tokens-container">
+                        <span class="text-slate-400 text-sm">Esperando expresi&oacute;n...</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Equivalencia AR &rarr; SQL</h3>
+                    <div class="equivalence-box">
+                        <div class="border border-slate-300 rounded-sm p-3 bg-slate-50">
+                            <p class="text-xs font-semibold text-slate-500 uppercase mb-1">&Aacute;lgebra Relacional</p>
+                            <pre id="arEquivOutput" class="text-xs whitespace-pre-wrap break-words text-slate-800">--</pre>
+                        </div>
+                        <div class="equivalence-arrow"><i class="bi bi-arrow-right"></i></div>
+                        <div class="border border-blue-300 rounded-sm p-3 bg-blue-50">
+                            <p class="text-xs font-semibold text-blue-800 uppercase mb-1">SQL generado</p>
+                            <pre id="sqlEquivOutput" class="text-xs whitespace-pre-wrap break-words text-blue-950">--</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">&Aacute;rbol sint&aacute;ctico</h3>
+                    <pre id="treeOutput" class="tree-view bg-slate-50 border border-slate-200 rounded-sm p-3 text-sm overflow-x-auto text-slate-800 max-h-56">Esperando consulta...</pre>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+                        Tabla de resultados <span id="execInfo" class="text-slate-400 normal-case font-normal"></span>
+                    </h3>
+                    <div id="resultTableContainer" class="bg-slate-50 border border-slate-200 rounded-sm p-3 text-sm overflow-x-auto text-slate-500 max-h-80">
+                        Esperando ejecuci&oacute;n...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="tipBanner" class="fixed bottom-0 left-0 right-0 bg-slate-800 text-slate-100 text-sm py-3 px-4 shadow-lg z-40 hidden">
+        <div class="container mx-auto max-w-7xl flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <i class="bi bi-info-circle text-blue-300 text-base"></i>
+                <span><strong>Tip:</strong> abre el diccionario de datos y haz clic en una tabla para ver su contenido real.</span>
+            </div>
+            <button id="closeTipBtn" class="text-slate-300 hover:text-white transition shrink-0"><i class="bi bi-x-lg"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= Diccionario de datos ================= -->
+    <div id="dictionaryOverlay" class="offcanvas-overlay fixed inset-0 bg-black/40 z-50"></div>
+    <aside id="dictionaryPanel" class="offcanvas fixed top-0 right-0 h-full w-full max-w-4xl bg-white shadow-2xl z-50 flex flex-col">
+        <div class="bg-slate-800 text-white px-5 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="bi bi-journal-text text-blue-300"></i>
+                <h3 class="text-base font-semibold">Diccionario de datos: <span id="dictionaryTitle">--</span></h3>
+            </div>
+            <button id="closeDictionaryBtn" class="text-slate-300 hover:text-white transition"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="px-5 py-3 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+            <i class="bi bi-search text-slate-400"></i>
+            <input id="dictionarySearch" placeholder="Buscar tabla o atributo..." class="w-full bg-transparent text-sm outline-none text-slate-700">
+            <span id="dictionaryCount" class="text-xs text-slate-400 shrink-0"></span>
+        </div>
+        <div id="dictionaryBody" class="p-5 flex-1 overflow-auto bg-white">
+            <p class="text-slate-400 text-sm">Cargando diccionario...</p>
+        </div>
+        <div class="bg-slate-100 px-5 py-2 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
+            <span><i class="bi bi-info-circle"></i> Haz clic en el nombre de una tabla para ver su contenido.</span>
+            <span>Primera versi&oacute;n (sin diagramas E-R)</span>
+        </div>
+    </aside>
+
+    <!-- ================= Vista previa de tabla ================= -->
+    <div id="tableModal" class="modal-overlay">
+        <div class="modal-content" style="width: 900px;">
+            <div class="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="bi bi-table text-blue-300"></i>
+                    <h3 class="text-base font-semibold">
+                        <span id="modalSchema">--</span>.<span id="modalTable">--</span>
+                    </h3>
+                </div>
+                <button id="closeModalBtn" class="text-slate-300 hover:text-white transition"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div id="modalBody" class="p-4 overflow-auto flex-1 bg-white">Cargando...</div>
+            <div class="bg-slate-100 px-4 py-2 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
+                <span id="modalInfo"></span>
+                <span>Vista previa limitada a 50 filas</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.v4.js"></script>
+    <script src="/js/editor.v4.js"></script>
+    <script src="/js/modal.v4.js"></script>
+    <script src="/js/connection.v4.js"></script>
+    <script src="/js/translate.v4.js"></script>
+    <script src="/js/main.v4.js"></script>
+</body>
+</html>

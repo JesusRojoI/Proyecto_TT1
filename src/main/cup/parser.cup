@@ -1,0 +1,223 @@
+package com.ipn.escom.tt1.parser;
+
+import java_cup.runtime.*;
+import com.ipn.escom.tt1.ast.*;
+import java.util.*;
+
+/* =============================================================
+   Gramática del Álgebra Relacional (TT1)
+   Basada en la propuesta de GramAlgRel.cup del profesor, ampliada con
+   funciones trigonométricas/matemáticas, comparadores de signo, literales
+   de cadena, comentarios y los símbolos unicode de los operadores.
+   ============================================================= */
+
+parser code {:
+    public parser(Lexer lexer) {
+        super(lexer);
+    }
+
+    /* Catálogo de errores sintácticos: describe la violación de la gramática. */
+    private static String tokenName(int id) {
+        if (id >= 0 && id < sym.terminalNames.length) {
+            return sym.terminalNames[id];
+        }
+        return "?";
+    }
+
+    @Override
+    public void syntax_error(Symbol cur_token) {
+        int line = -1;
+        int column = -1;
+        String found = "fin de la expresión";
+        if (cur_token != null && cur_token.sym != sym.EOF) {
+            line = cur_token.left + 1;
+            column = cur_token.right + 1;
+            found = tokenName(cur_token.sym);
+            if (cur_token.value != null) {
+                found = found + " '" + cur_token.value + "'";
+            }
+        }
+        List<String> expected = new ArrayList<>();
+        for (Integer id : expected_token_ids()) {
+            expected.add(tokenName(id));
+        }
+        String message = "Violación sintáctica: se encontró " + found
+                + " cuando no corresponde con la gramática del álgebra relacional.";
+        throw new SyntaxException("SIN-01", message, line, column, found, expected);
+    }
+
+    @Override
+    public void report_fatal_error(String message, Object info) {
+        throw new SyntaxException("SIN-01", message, -1, -1,
+                String.valueOf(info), Collections.emptyList());
+    }
+
+    @Override
+    public void unrecovered_syntax_error(Symbol cur_token) {
+        syntax_error(cur_token);
+    }
+
+    private static ScalarExpression qualified(String q) {
+        int dot = q.indexOf('.');
+        if (dot < 0) {
+            return new AttributeNode(q);
+        }
+        return new AttributeNode(q.substring(0, dot), q.substring(dot + 1));
+    }
+:}
+
+init with {: :};
+
+scan with {: return getScanner().next_token(); :};
+
+/* ------------------------- Terminales ------------------------- */
+terminal LPAREN, RPAREN, COMMA, SEMICOLON;
+terminal PLUS, MINUS, TIMES, DIVIDE, POWER;
+terminal UMINUS;
+terminal EQ, NE, GT, GE, LT, LE;
+terminal AND, OR, NOT;
+terminal ASSIGN;
+terminal SELECT, PROJECT, JOIN, UNION, INTERSEC, DIFFERENCE, PRODUCT, GROUP;
+terminal SUM, AVG, MAX, MIN, COUNT;
+terminal TRUE, FALSE, NULL;
+
+terminal String IDENTIFIER;
+terminal String QUALIFIED;
+terminal String NUMBER;
+terminal String STRING;
+terminal String VARIABLE;
+terminal String FUNCTION;
+
+/* ------------------------ No terminales ----------------------- */
+non terminal Expression program;
+non terminal Expression relation;
+non terminal ExpressionList attrList;
+non terminal AggregateList aggList;
+non terminal AggregateExpression agg;
+non terminal ScalarExpression expr;
+non terminal ArrayList argList;
+
+/* ------------------------ Precedencias ------------------------ */
+precedence left OR;
+precedence left AND;
+precedence left NOT;
+precedence left EQ, NE, GT, GE, LT, LE;
+precedence left UNION, INTERSEC, DIFFERENCE;
+precedence left JOIN;
+precedence left PLUS, MINUS;
+precedence left PRODUCT, TIMES, DIVIDE;
+precedence right POWER;
+precedence right UMINUS;
+
+start with program;
+
+program ::= relation:r SEMICOLON   {: RESULT = r; :}
+          | relation:r             {: RESULT = r; :}
+          ;
+
+/* ---------------------- Relaciones ---------------------------- */
+relation ::= SELECT LPAREN expr:c RPAREN LPAREN relation:s RPAREN
+                {: RESULT = new SelectNode(c, s); :}
+           | SELECT LPAREN expr:c COMMA relation:s RPAREN
+                {: RESULT = new SelectNode(c, s); :}
+           | PROJECT LPAREN attrList:a RPAREN LPAREN relation:s RPAREN
+                {: RESULT = new ProjectNode(a, s); :}
+           | PROJECT LPAREN attrList:a SEMICOLON relation:s RPAREN
+                {: RESULT = new ProjectNode(a, s); :}
+           | GROUP LPAREN attrList:a SEMICOLON aggList:g RPAREN LPAREN relation:s RPAREN
+                {: RESULT = new GroupNode(a, g, s); :}
+           | GROUP LPAREN attrList:a SEMICOLON aggList:g SEMICOLON relation:s RPAREN
+                {: RESULT = new GroupNode(a, g, s); :}
+           | JOIN LPAREN relation:l COMMA relation:r RPAREN
+                {: RESULT = new JoinNode(l, r, null); :}
+           | JOIN LPAREN relation:l COMMA relation:r COMMA expr:c RPAREN
+                {: RESULT = new JoinNode(l, r, c); :}
+           | UNION LPAREN relation:l COMMA relation:r RPAREN
+                {: RESULT = new BinaryOpNode("UNION", l, r); :}
+           | INTERSEC LPAREN relation:l COMMA relation:r RPAREN
+                {: RESULT = new BinaryOpNode("INTERSECT", l, r); :}
+           | DIFFERENCE LPAREN relation:l COMMA relation:r RPAREN
+                {: RESULT = new BinaryOpNode("DIFFERENCE", l, r); :}
+           | PRODUCT LPAREN relation:l COMMA relation:r RPAREN
+                {: RESULT = new BinaryOpNode("PRODUCT", l, r); :}
+           | VARIABLE:v ASSIGN relation:r
+                {: RESULT = new AssignNode(v, r); :}
+           | VARIABLE:v
+                {: RESULT = new VariableNode(v); :}
+           | IDENTIFIER:t
+                {: RESULT = new TableNode(t); :}
+           | LPAREN relation:r RPAREN
+                {: RESULT = r; :}
+           | relation:l UNION relation:r
+                {: RESULT = new BinaryOpNode("UNION", l, r); :}
+           | relation:l INTERSEC relation:r
+                {: RESULT = new BinaryOpNode("INTERSECT", l, r); :}
+           | relation:l DIFFERENCE relation:r
+                {: RESULT = new BinaryOpNode("DIFFERENCE", l, r); :}
+           | relation:l MINUS relation:r
+                {: RESULT = new BinaryOpNode("DIFFERENCE", l, r); :}
+           | relation:l PRODUCT relation:r
+                {: RESULT = new BinaryOpNode("PRODUCT", l, r); :}
+           | relation:l TIMES relation:r
+                {: RESULT = new BinaryOpNode("PRODUCT", l, r); :}
+           | relation:l JOIN relation:r
+                {: RESULT = new JoinNode(l, r, null); :}
+           ;
+
+/* ---------------- Lista de atributos/expresiones -------------- */
+attrList ::= expr:e
+                {: RESULT = new ExpressionList(e); :}
+           | attrList:a COMMA expr:e
+                {: RESULT = a.add(e); :}
+           ;
+
+/* ---------------- Lista de funciones de agregación ------------ */
+aggList ::= agg:a
+                {: RESULT = new AggregateList(a); :}
+          | aggList:l COMMA agg:a
+                {: RESULT = l.add(a); :}
+          ;
+
+agg ::= SUM LPAREN expr:e RPAREN   {: RESULT = new AggregateExpression("SUM", e, false); :}
+      | AVG LPAREN expr:e RPAREN   {: RESULT = new AggregateExpression("AVG", e, false); :}
+      | MAX LPAREN expr:e RPAREN   {: RESULT = new AggregateExpression("MAX", e, false); :}
+      | MIN LPAREN expr:e RPAREN   {: RESULT = new AggregateExpression("MIN", e, false); :}
+      | COUNT LPAREN expr:e RPAREN {: RESULT = new AggregateExpression("COUNT", e, false); :}
+      | COUNT LPAREN TIMES RPAREN  {: RESULT = new AggregateExpression("COUNT", null, true); :}
+      ;
+
+/* ------------------- Expresiones escalares -------------------- */
+expr ::= expr:l PLUS expr:r    {: RESULT = new ArithNode("+", l, r); :}
+       | expr:l MINUS expr:r   {: RESULT = new ArithNode("-", l, r); :}
+       | expr:l TIMES expr:r   {: RESULT = new ArithNode("*", l, r); :}
+       | expr:l DIVIDE expr:r  {: RESULT = new ArithNode("/", l, r); :}
+       | expr:l POWER expr:r   {: RESULT = new ArithNode("^", l, r); :}
+       | MINUS expr:e {: RESULT = new UnaryNode("-", e); :} %prec UMINUS
+       | expr:l EQ expr:r      {: RESULT = new CompareNode("==", l, r); :}
+       | expr:l NE expr:r      {: RESULT = new CompareNode("!=", l, r); :}
+       | expr:l GT expr:r      {: RESULT = new CompareNode(">", l, r); :}
+       | expr:l GE expr:r      {: RESULT = new CompareNode(">=", l, r); :}
+       | expr:l LT expr:r      {: RESULT = new CompareNode("<", l, r); :}
+       | expr:l LE expr:r      {: RESULT = new CompareNode("<=", l, r); :}
+       | expr:l AND expr:r     {: RESULT = new LogicalNode("AND", l, r); :}
+       | expr:l OR expr:r      {: RESULT = new LogicalNode("OR", l, r); :}
+       | NOT expr:e            {: RESULT = new UnaryNode("NOT", e); :}
+       | LPAREN expr:e RPAREN  {: RESULT = e; :}
+       | FUNCTION:f LPAREN RPAREN
+                {: RESULT = new FunctionNode(f, new ArrayList<ScalarExpression>()); :}
+       | FUNCTION:f LPAREN argList:args RPAREN
+                {: RESULT = new FunctionNode(f, args); :}
+       | NUMBER:n          {: RESULT = LiteralNode.number(n); :}
+       | STRING:s          {: RESULT = LiteralNode.text(s); :}
+       | TRUE              {: RESULT = LiteralNode.keyword("TRUE"); :}
+       | FALSE             {: RESULT = LiteralNode.keyword("FALSE"); :}
+       | NULL              {: RESULT = LiteralNode.keyword("NULL"); :}
+       | IDENTIFIER:a      {: RESULT = new AttributeNode(a); :}
+       | QUALIFIED:q       {: RESULT = qualified(q); :}
+       ;
+
+argList ::= expr:e
+                {: ArrayList l = new ArrayList(); l.add(e); RESULT = l; :}
+          | argList:l COMMA expr:e
+                {: l.add(e); RESULT = l; :}
+          ;

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.ipn.escom.tt1.service.TranslationServiceTest
+-------------------------------------------------------------------------------
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.285 s -- in com.ipn.escom.tt1.service.TranslationServiceTest
