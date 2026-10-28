@@ -157,22 +157,6 @@ const Editor = (() => {
             });
             tableIndex.set(name, names);
         });
-        updateAutocompleteHint();
-    }
-
-    function updateAutocompleteHint() {
-        const hint = el('autocompleteHint');
-        if (!hint) return;
-        if (!dictionaryTables.length) {
-            hint.innerHTML = '<i class="bi bi-lightning-charge"></i> Conecta tu MySQL para autocompletar con el diccionario.';
-            hint.classList.add('is-muted');
-            return;
-        }
-        const attributes = attributeIndex.size;
-        hint.innerHTML = '<i class="bi bi-lightning-charge-fill"></i> Autocompletado: ' +
-            dictionaryTables.length + ' tablas, ' + attributes +
-            ' atributos · <strong>Tab</strong> para aceptar';
-        hint.classList.remove('is-muted');
     }
 
     function attributeSuggestions(prefix, qualifier, range) {
@@ -384,7 +368,6 @@ const Editor = (() => {
     }
 
     function init() {
-        updateAutocompleteHint();
         if (typeof window.require !== 'undefined' && typeof monaco === 'undefined') {
             window.MonacoEnvironment = {
                 getWorkerUrl: function () {

@@ -43,6 +43,8 @@ public class AggregateList extends ScalarExpression {
         List<Map<String, Object>> children = aggregates.stream()
                 .map(a -> TreeNode.child(a.toTree()))
                 .toList();
-        return TreeNode.of("agregados", aggregates.size() + " función(es)", "list", children);
+        return TreeNode.of("Agregados",
+                aggregates.size() == 1 ? "1 función" : aggregates.size() + " funciones",
+                "list", children);
     }
 }

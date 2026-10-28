@@ -68,8 +68,8 @@ public class BinaryOpNode extends Expression {
     @Override
     public Map<String, Object> toTree() {
         return TreeNode.of(symbol(), treeLabel(), "set", List.of(
-                TreeNode.child(left.toTree(), "izquierda"),
-                TreeNode.child(right.toTree(), "derecha")));
+                TreeNode.child(left.toTree(), "operando izquierdo"),
+                TreeNode.child(right.toTree(), "operando derecho")));
     }
 
     @Override

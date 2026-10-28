@@ -55,7 +55,7 @@ public class CompareNode extends ScalarExpression {
     @Override
     public Map<String, Object> toTree() {
         return TreeNode.of(operator, name(), "compare", List.of(
-                TreeNode.child(left.toTree(), "izquierda"),
-                TreeNode.child(right.toTree(), "derecha")));
+                TreeNode.child(left.toTree(), "operando izquierdo"),
+                TreeNode.child(right.toTree(), "operando derecho")));
     }
 }

@@ -40,7 +40,7 @@ public class GroupNode extends Expression {
         return TreeNode.of("γ", "Agrupación", "group", List.of(
                 TreeNode.child(groupAttributes.toTree(), "agrupar por"),
                 TreeNode.child(aggregates.toTree(), "agregados"),
-                TreeNode.child(source.toTree(), "fuente")));
+                TreeNode.child(source.toTree(), "relación")));
     }
 
     @Override

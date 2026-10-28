@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('translateBtn').addEventListener('click', () => Translate.run());
     const copyButton = document.getElementById('copySqlBtn');
     if (copyButton) copyButton.addEventListener('click', () => Translate.copySql());
+    if (typeof Translate.initResultModal === 'function') Translate.initResultModal();
 
     /* ---------- Ejemplos ---------- */
     document.getElementById('exampleSelect').addEventListener('change', (e) => {

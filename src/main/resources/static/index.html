@@ -20,17 +20,15 @@
     <header class="app-header">
         <div class="header-inner">
             <a class="brand" href="/" aria-label="Ir al inicio">
-                <span class="brand-mark" aria-hidden="true">Σ</span>
                 <span class="brand-copy">
-                    <strong>Álgebra Relacional</strong>
-                    <small>IPN · ESCOM · TT 2027-A159</small>
+                    <strong>Sistema de Apoyo para la Enseñanza del Álgebra Relacional</strong>
+                    <small>ESCOM - IPN</small>
                 </span>
             </a>
             <nav class="top-nav" aria-label="Navegación principal">
                 <a href="/" class="active" aria-current="page"><i class="bi bi-pencil-square" aria-hidden="true"></i> Herramienta</a>
                 <a href="/presentacion.html"><i class="bi bi-info-circle" aria-hidden="true"></i> Acerca de</a>
                 <a href="/instalacion.html"><i class="bi bi-terminal" aria-hidden="true"></i> Instalación</a>
-                <a href="/terminos.html"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> Términos</a>
                 <a href="/api/manual" download class="nav-manual"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Manual</a>
             </nav>
         </div>
@@ -45,50 +43,47 @@
                     <h2 id="connectionTitle" class="card-title"><i class="bi bi-server" aria-hidden="true"></i> Conexión a MySQL local</h2>
                     <p class="card-subtitle">Las credenciales se usan únicamente durante la sesión y no se guardan en el servidor.</p>
                 </div>
-                <span id="connectionBadge" class="status-badge hidden">
-                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Conectado
-                </span>
             </div>
 
-            <div id="connectionForm" class="connection-grid">
-                <div class="field">
-                    <label for="connHost">Host</label>
-                    <input id="connHost" value="localhost" autocomplete="off">
+            <div id="connectionForm" class="connection-form">
+                <div class="connection-grid">
+                    <div class="field">
+                        <label for="connHost">Host</label>
+                        <input id="connHost" value="localhost" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="connPort">Puerto</label>
+                        <input id="connPort" value="3306" inputmode="numeric" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="connUser">Usuario</label>
+                        <input id="connUser" value="root" autocomplete="username">
+                    </div>
+                    <div class="field">
+                        <label for="connPassword">Contraseña</label>
+                        <input id="connPassword" type="password" autocomplete="current-password">
+                    </div>
                 </div>
-                <div class="field">
-                    <label for="connPort">Puerto</label>
-                    <input id="connPort" value="3306" inputmode="numeric" autocomplete="off">
-                </div>
-                <div class="field">
-                    <label for="connUser">Usuario</label>
-                    <input id="connUser" value="root" autocomplete="username">
-                </div>
-                <div class="field">
-                    <label for="connPassword">Contraseña</label>
-                    <input id="connPassword" type="password" autocomplete="current-password">
-                </div>
-                <div class="field field-action">
-                    <button id="connectBtn" class="btn btn-primary btn-block">
+                <div class="connection-submit">
+                    <button id="connectBtn" class="btn btn-primary">
                         <i class="bi bi-plug" aria-hidden="true"></i> Conectar
                     </button>
+                    <p id="connectionMessage" class="connection-message">Ingresa tus claves locales de MySQL para cargar tus bases de datos.</p>
                 </div>
-                <p id="connectionMessage" class="connection-message">Ingresa tus claves locales de MySQL para cargar tus bases de datos.</p>
             </div>
 
             <div id="connectionInfo" class="connection-connected hidden">
-                <div class="connection-connected-main">
-                    <p id="connSummary" class="connection-summary"></p>
-                    <div class="field">
-                        <label for="databaseSelect"><i class="bi bi-database" aria-hidden="true"></i> Base de datos</label>
-                        <select id="databaseSelect"></select>
-                    </div>
+                <p id="connSummary" class="connection-summary"></p>
+                <div class="field">
+                    <label for="databaseSelect"><i class="bi bi-database" aria-hidden="true"></i> Base de datos</label>
+                    <select id="databaseSelect"></select>
                 </div>
                 <div class="connection-actions">
-                    <button id="openDictionaryBtn" class="btn btn-outline">
-                        <i class="bi bi-journal-text" aria-hidden="true"></i> Diccionario
-                    </button>
                     <button id="disconnectBtn" class="btn btn-ghost">
                         <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Desconectar
+                    </button>
+                    <button id="openDictionaryBtn" class="btn btn-outline">
+                        <i class="bi bi-journal-text" aria-hidden="true"></i> Diccionario
                     </button>
                 </div>
             </div>
@@ -102,11 +97,8 @@
                 <div class="card-head compact">
                     <div>
                         <h2 id="editorTitle" class="card-title"><i class="bi bi-input-cursor-text" aria-hidden="true"></i> Expresión de Álgebra Relacional</h2>
-                        <p class="card-subtitle">Ctrl + Enter para traducir. Usa Tab para aceptar las sugerencias del diccionario.</p>
                     </div>
                 </div>
-
-                <div id="autocompleteHint" class="autocomplete-hint is-muted" role="status" aria-live="polite"></div>
 
                 <div id="editorContainer" class="editor-container"></div>
 
@@ -170,6 +162,9 @@
                 <div class="process-block results-block">
                     <div class="section-label">
                         <span>Tabla de resultados <span id="execInfo" class="exec-info"></span></span>
+                        <button id="expandResultsBtn" class="mini-btn" type="button" disabled>
+                            <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i> Ampliar
+                        </button>
                     </div>
                     <div id="resultTableContainer" class="result-table-container">
                         Esperando ejecución...
@@ -181,13 +176,8 @@
 
     <footer class="app-footer">
         <div class="footer-inner">
-            <p><strong>TT 2027-A159</strong> · Instituto Politécnico Nacional · ESCOM</p>
-            <nav aria-label="Enlaces del pie de página">
-                <a href="/presentacion.html">Acerca de</a>
-                <a href="/instalacion.html">Guía de instalación</a>
-                <a href="/terminos.html">Términos y condiciones</a>
-                <a href="/api/manual" download>Manual de usuario</a>
-            </nav>
+            <span class="footer-code">TT 2027-A159</span>
+            <a href="/terminos.html">Términos y condiciones</a>
         </div>
     </footer>
 
@@ -199,7 +189,7 @@
                     <i class="bi bi-diagram-3" aria-hidden="true"></i>
                     <div>
                         <h3 id="treeModalTitle">Árbol sintáctico</h3>
-                        <p>Generado con Graphviz · disposición vertical</p>
+                        <p>Diagrama del análisis sintáctico · disposición vertical</p>
                     </div>
                 </div>
                 <div class="tree-toolbar" role="group" aria-label="Controles del diagrama">
@@ -269,6 +259,21 @@
                 <span id="modalInfo"></span>
                 <span>Vista previa limitada a 50 filas</span>
             </div>
+        </div>
+    </div>
+
+    <!-- ================= Resultados ampliados ================= -->
+    <div id="resultModal" class="modal-overlay result-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="resultModalTitle" aria-hidden="true">
+        <div class="result-modal-content">
+            <div class="modal-header">
+                <div class="flex items-center gap-2">
+                    <i class="bi bi-table" aria-hidden="true"></i>
+                    <h3 id="resultModalTitle">Tabla de resultados</h3>
+                    <span id="resultModalInfo" class="result-modal-info"></span>
+                </div>
+                <button id="closeResultModalBtn" class="icon-btn" aria-label="Cerrar tabla ampliada"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+            </div>
+            <div id="resultModalBody" class="result-modal-body"></div>
         </div>
     </div>
 

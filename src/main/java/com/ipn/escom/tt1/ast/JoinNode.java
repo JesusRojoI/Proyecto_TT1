@@ -48,8 +48,8 @@ public class JoinNode extends Expression {
     @Override
     public Map<String, Object> toTree() {
         List<Map<String, Object>> children = new ArrayList<>();
-        children.add(TreeNode.child(left.toTree(), "izquierda"));
-        children.add(TreeNode.child(right.toTree(), "derecha"));
+        children.add(TreeNode.child(left.toTree(), "relación izquierda"));
+        children.add(TreeNode.child(right.toTree(), "relación derecha"));
         if (condition != null) {
             children.add(TreeNode.child(condition.toTree(), "condición"));
         }

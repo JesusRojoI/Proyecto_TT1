@@ -24,38 +24,38 @@ const TreeView = (() => {
         select: 'Selección',
         project: 'Proyección',
         join: 'Reunión',
-        set: 'Conjuntos',
+        set: 'Operaciones de conjuntos',
         group: 'Agrupación',
-        aggregate: 'Agregado',
+        aggregate: 'Función de agregación',
         compare: 'Comparación',
-        logic: 'Lógica',
+        logic: 'Conectiva lógica',
         arith: 'Aritmética',
         function: 'Función',
-        table: 'Tabla',
+        table: 'Relación base',
         attribute: 'Atributo',
         literal: 'Literal',
         assign: 'Asignación',
         variable: 'Variable',
-        list: 'Lista'
+        list: 'Lista de atributos'
     };
 
     const legendColors = {
-        select: '#2563eb',
-        project: '#0d9488',
-        join: '#6d28d9',
-        set: '#0e7490',
-        group: '#b45309',
-        aggregate: '#7e22ce',
-        compare: '#be123c',
-        logic: '#9f1239',
-        arith: '#c2410c',
-        function: '#047857',
-        table: '#334155',
-        attribute: '#475569',
-        literal: '#15803d',
-        assign: '#92400e',
-        variable: '#a16207',
-        list: '#64748b'
+        select: '#3b82f6',
+        project: '#14b8a6',
+        join: '#6366f1',
+        set: '#0891b2',
+        group: '#f59e0b',
+        aggregate: '#a855f7',
+        compare: '#fb7185',
+        logic: '#ec4899',
+        arith: '#fb923c',
+        function: '#10b981',
+        table: '#475569',
+        attribute: '#94a3b8',
+        literal: '#22c55e',
+        assign: '#d97706',
+        variable: '#eab308',
+        list: '#94a3b8'
     };
 
     function el(id) { return document.getElementById(id); }
@@ -151,6 +151,45 @@ const TreeView = (() => {
         legend.classList.toggle('hidden', legend.childElementCount === 0);
     }
 
+    /* Graphviz dibuja las cajas con esquinas redondeadas demasiado amplias.
+       Se sustituye cada caja por un rectángulo con radio pequeño y uniforme. */
+    function roundNodeCorners(svg) {
+        svg.querySelectorAll('g.node').forEach(group => {
+            const shape = group.querySelector('polygon, path');
+            if (!shape) return;
+            if (shape.tagName.toLowerCase() === 'polygon') {
+                const points = (shape.getAttribute('points') || '').trim().split(/\s+/).filter(Boolean);
+                // Graphviz repite el primer punto al final del polígono.
+                const unique = points.length > 1 && points[0] === points[points.length - 1]
+                    ? points.slice(0, -1)
+                    : points;
+                if (unique.length !== 4) return;
+            }
+            let box;
+            try {
+                box = shape.getBBox();
+            } catch (error) {
+                return;
+            }
+            if (!box || box.width <= 0 || box.height <= 0) return;
+
+            const rect = document.createElementNS(NS, 'rect');
+            rect.setAttribute('x', box.x);
+            rect.setAttribute('y', box.y);
+            rect.setAttribute('width', box.width);
+            rect.setAttribute('height', box.height);
+            rect.setAttribute('rx', '5');
+            rect.setAttribute('ry', '5');
+            ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'fill-opacity', 'stroke-opacity']
+                .forEach(attribute => {
+                    if (shape.hasAttribute(attribute)) {
+                        rect.setAttribute(attribute, shape.getAttribute(attribute));
+                    }
+                });
+            shape.replaceWith(rect);
+        });
+    }
+
     async function renderDiagram() {
         if (!dotSource) return;
         const canvas = el('treeModalCanvas');
@@ -182,6 +221,7 @@ const TreeView = (() => {
             svgElement.setAttribute('preserveAspectRatio', 'xMidYMin meet');
             svgElement.style.maxWidth = 'none';
             svgElement.style.display = 'block';
+            roundNodeCorners(svgElement);
             svgElement.setAttribute('role', 'img');
             svgElement.setAttribute('aria-label', 'Árbol sintáctico de la expresión de álgebra relacional');
             renderedDot = dotSource;

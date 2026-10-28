@@ -45,7 +45,9 @@ public class ExpressionList extends ScalarExpression {
         List<Map<String, Object>> children = expressions.stream()
                 .map(e -> TreeNode.child(e.toTree()))
                 .toList();
-        return TreeNode.of("lista", expressions.size() + " elemento(s)", "list", children);
+        return TreeNode.of("Atributos",
+                expressions.size() == 1 ? "1 atributo" : expressions.size() + " atributos",
+                "list", children);
     }
 }
 

@@ -44,6 +44,6 @@ public class AggregateExpression extends ScalarExpression {
             return TreeNode.of(name + "(*)", "Agregación", "aggregate", List.of());
         }
         return TreeNode.of(name + "()", "Agregación", "aggregate", List.of(
-                TreeNode.child(argument.toTree(), "sobre")));
+                TreeNode.child(argument.toTree(), "aplicado a")));
     }
 }

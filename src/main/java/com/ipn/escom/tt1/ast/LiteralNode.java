@@ -45,9 +45,15 @@ public class LiteralNode extends ScalarExpression {
     @Override
     public Map<String, Object> toTree() {
         return TreeNode.leaf(value, switch (kind) {
-            case "NUMERO" -> "Número";
-            case "CADENA" -> "Cadena";
-            default -> "Lógico";
+            case "NUMERO" -> isDecimal(value) ? "Decimal" : "Entero";
+            case "CADENA" -> "Cadena de texto";
+            case "LOGICO" -> "Booleano";
+            default -> "Valor nulo";
         }, "literal");
+    }
+
+    private boolean isDecimal(String raw) {
+        String normalized = raw.toLowerCase();
+        return normalized.contains(".") || normalized.contains("e");
     }
 }

@@ -40,7 +40,7 @@ public class FunctionNode extends ScalarExpression {
         List<Map<String, Object>> children = new ArrayList<>();
         int index = 1;
         for (ScalarExpression argument : arguments) {
-            children.add(TreeNode.child(argument.toTree(), arguments.size() == 1 ? "argumento" : "arg " + index));
+            children.add(TreeNode.child(argument.toTree(), arguments.size() == 1 ? "argumento" : "argumento " + index));
             index++;
         }
         return TreeNode.of(name + "()", "Función", "function", children);

@@ -5,8 +5,55 @@
 
 const Translate = (() => {
     let lastExpression = '';
+    let lastTableHtml = '';
+    let lastTableInfo = '';
 
     function el(id) { return document.getElementById(id); }
+
+    function setExpandEnabled(enabled) {
+        const button = el('expandResultsBtn');
+        if (button) button.disabled = !enabled;
+    }
+
+    function openResultModal() {
+        const modal = el('resultModal');
+        const body = el('resultModalBody');
+        if (!modal || !body || !lastTableHtml) return;
+        body.innerHTML = lastTableHtml;
+        const info = el('resultModalInfo');
+        if (info) info.textContent = lastTableInfo.replace(/^\s*—\s*/, '');
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-locked');
+        const closeButton = el('closeResultModalBtn');
+        if (closeButton) closeButton.focus();
+    }
+
+    function closeResultModal() {
+        const modal = el('resultModal');
+        if (!modal || !modal.classList.contains('open')) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-locked');
+        const expandButton = el('expandResultsBtn');
+        if (expandButton) expandButton.focus();
+    }
+
+    function initResultModal() {
+        const expandButton = el('expandResultsBtn');
+        const closeButton = el('closeResultModalBtn');
+        const modal = el('resultModal');
+        if (expandButton) expandButton.addEventListener('click', openResultModal);
+        if (closeButton) closeButton.addEventListener('click', closeResultModal);
+        if (modal) {
+            modal.addEventListener('click', event => {
+                if (event.target === modal) closeResultModal();
+            });
+        }
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeResultModal();
+        });
+    }
 
     function escapeHtml(s) {
         if (s === null || s === undefined) return '';
@@ -64,6 +111,9 @@ const Translate = (() => {
     function renderTable(execution) {
         const container = el('resultTableContainer');
         const execInfo = el('execInfo');
+        lastTableHtml = '';
+        lastTableInfo = '';
+        setExpandEnabled(false);
         if (!execution) {
             container.innerHTML = '<span class="text-slate-500">Sin ejecución: conecta una base de datos para ejecutar la consulta.</span>';
             execInfo.textContent = '';
@@ -94,7 +144,10 @@ const Translate = (() => {
         });
         html += '</tbody></table>';
         container.innerHTML = html;
-        execInfo.textContent = ' — ' + execution.rowCount + ' filas, ' + execution.elapsedMs + ' ms';
+        lastTableHtml = html;
+        lastTableInfo = ' — ' + execution.rowCount + ' filas, ' + execution.elapsedMs + ' ms';
+        execInfo.textContent = lastTableInfo;
+        setExpandEnabled(true);
     }
 
     async function run() {
@@ -116,6 +169,8 @@ const Translate = (() => {
         el('tokensContainer').innerHTML = '<span class="text-slate-400 text-sm">Tokenizando...</span>';
         el('resultTableContainer').innerHTML = '<span class="text-slate-500">Procesando...</span>';
         el('execInfo').textContent = '';
+        setExpandEnabled(false);
+        closeResultModal();
 
         try {
             const data = await API.translate(rawExpression, Connection.getDatabase());
@@ -134,12 +189,16 @@ const Translate = (() => {
                 if (typeof TreeView !== 'undefined') TreeView.clear('La expresión no pudo analizarse.');
                 el('sqlEquivOutput').textContent = '--';
                 el('resultTableContainer').innerHTML = '<span class="text-red-700 text-xs">No se pudo ejecutar.</span>';
+                lastTableHtml = '';
+                setExpandEnabled(false);
             }
         } catch (error) {
             renderError({ message: 'Error de conexión: ' + error.message });
             if (typeof TreeView !== 'undefined') TreeView.clear('Error de conexión.');
             el('sqlEquivOutput').textContent = '--';
             el('resultTableContainer').innerHTML = '<span class="text-red-700 text-xs">Error de conexión.</span>';
+            lastTableHtml = '';
+            setExpandEnabled(false);
         }
     }
 
@@ -163,5 +222,8 @@ const Translate = (() => {
         }
     }
 
-    return { run, copySql, getLast, setExpression: (v) => Editor.setValue(v) };
+    return {
+        run, copySql, getLast, initResultModal,
+        setExpression: (v) => Editor.setValue(v)
+    };
 })();

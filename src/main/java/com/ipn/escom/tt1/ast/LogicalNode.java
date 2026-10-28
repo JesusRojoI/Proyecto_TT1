@@ -35,7 +35,7 @@ public class LogicalNode extends ScalarExpression {
     public Map<String, Object> toTree() {
         boolean and = "AND".equals(operator);
         return TreeNode.of(and ? "∧" : "∨", and ? "Conjunción" : "Disyunción", "logic", List.of(
-                TreeNode.child(left.toTree(), "izquierda"),
-                TreeNode.child(right.toTree(), "derecha")));
+                TreeNode.child(left.toTree(), "operando izquierdo"),
+                TreeNode.child(right.toTree(), "operando derecho")));
     }
 }

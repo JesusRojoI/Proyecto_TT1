@@ -34,7 +34,7 @@ public class ProjectNode extends Expression {
     public Map<String, Object> toTree() {
         return TreeNode.of("π", "Proyección", "project", List.of(
                 TreeNode.child(attributes.toTree(), "atributos"),
-                TreeNode.child(source.toTree(), "fuente")));
+                TreeNode.child(source.toTree(), "relación")));
     }
 
     @Override

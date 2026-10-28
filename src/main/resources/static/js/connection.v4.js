@@ -79,7 +79,6 @@ const Connection = (() => {
         dictionary = null;
         el('connectionForm').classList.remove('hidden');
         el('connectionInfo').classList.add('hidden');
-        el('connectionBadge').classList.add('hidden');
         el('exampleSelect').innerHTML = '<option value="">-- Selecciona un ejemplo --</option>';
         if (typeof Editor !== 'undefined') Editor.setDictionary(null);
         status('Conexión cerrada.', 'info');
@@ -89,7 +88,6 @@ const Connection = (() => {
     function applyConnection(info) {
         el('connectionForm').classList.add('hidden');
         el('connectionInfo').classList.remove('hidden');
-        el('connectionBadge').classList.remove('hidden');
         el('connSummary').innerHTML =
             '<i class="bi bi-check-circle text-emerald-600"></i> Conectado a <strong>' +
             escapeHtml(info.user) + '@' + escapeHtml(info.host) + ':' + info.port + '</strong>' +
