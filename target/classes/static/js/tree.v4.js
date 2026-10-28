@@ -20,45 +20,53 @@ const TreeView = (() => {
     let zoom = 1;
     let vizPromise = null;
 
-    const legendLabels = {
-        select: 'Selección',
-        project: 'Proyección',
-        join: 'Reunión',
-        set: 'Operaciones de conjuntos',
-        group: 'Agrupación',
-        aggregate: 'Función de agregación',
-        compare: 'Comparación',
-        logic: 'Conectiva lógica',
-        arith: 'Aritmética',
-        function: 'Función',
-        table: 'Relación base',
-        attribute: 'Atributo',
-        literal: 'Literal',
-        assign: 'Asignación',
-        variable: 'Variable',
-        list: 'Lista de atributos'
-    };
-
-    const legendColors = {
-        select: '#3b82f6',
-        project: '#14b8a6',
-        join: '#6366f1',
-        set: '#0891b2',
-        group: '#f59e0b',
-        aggregate: '#a855f7',
-        compare: '#fb7185',
-        logic: '#ec4899',
-        arith: '#fb923c',
-        function: '#10b981',
-        table: '#475569',
-        attribute: '#94a3b8',
-        literal: '#22c55e',
-        assign: '#d97706',
-        variable: '#eab308',
-        list: '#94a3b8'
+    /* Cada categoría se presenta con su símbolo, un nombre breve y una
+       explicación de una línea. Así la leyenda explica qué hace cada nodo en
+       lugar de repetir una etiqueta genérica. */
+    const legendMeta = {
+        select: { symbol: 'σ', label: 'Selección', hint: 'filtra filas', fill: '#dbeafe', border: '#3b82f6', ink: '#1e3a8a' },
+        project: { symbol: 'π', label: 'Proyección', hint: 'elige columnas', fill: '#ccfbf1', border: '#14b8a6', ink: '#115e59' },
+        join: { symbol: '⋈', label: 'Reunión', hint: 'combina relaciones', fill: '#e0e7ff', border: '#6366f1', ink: '#3730a3' },
+        set: { symbol: '∪', label: 'Conjuntos', hint: 'une o resta filas', fill: '#cffafe', border: '#0891b2', ink: '#155e75' },
+        group: { symbol: 'γ', label: 'Agrupación', hint: 'forma grupos', fill: '#fef3c7', border: '#f59e0b', ink: '#92400e' },
+        aggregate: { symbol: '∑', label: 'Agregación', hint: 'resume valores', fill: '#f3e8ff', border: '#a855f7', ink: '#6b21a8' },
+        compare: { symbol: '≥', label: 'Comparación', hint: 'contrasta valores', fill: '#ffe4e6', border: '#fb7185', ink: '#9f1239' },
+        logic: { symbol: '∧', label: 'Conectiva', hint: 'une condiciones', fill: '#fce7f3', border: '#ec4899', ink: '#9d174d' },
+        arith: { symbol: '±', label: 'Aritmética', hint: 'calcula números', fill: '#ffedd5', border: '#fb923c', ink: '#9a3412' },
+        function: { symbol: 'ƒ', label: 'Función', hint: 'transforma valores', fill: '#d1fae5', border: '#10b981', ink: '#065f46' },
+        table: { symbol: '▦', label: 'Relación base', hint: 'tabla del esquema', fill: '#cbd5e1', border: '#475569', ink: '#0f172a' },
+        attribute: { symbol: '▯', label: 'Atributo', hint: 'columna de tabla', fill: '#e2e8f0', border: '#94a3b8', ink: '#1e293b' },
+        literal: { symbol: '#', label: 'Literal', hint: 'valor constante', fill: '#dcfce7', border: '#22c55e', ink: '#166534' },
+        assign: { symbol: '←', label: 'Asignación', hint: 'guarda resultado', fill: '#fef3c7', border: '#d97706', ink: '#78350f' },
+        variable: { symbol: 'x', label: 'Variable', hint: 'referencia previa', fill: '#fef9c3', border: '#eab308', ink: '#713f12' },
+        list: { symbol: '≡', label: 'Lista', hint: 'varios elementos', fill: '#f1f5f9', border: '#94a3b8', ink: '#334155' }
     };
 
     function el(id) { return document.getElementById(id); }
+
+    /* Estado vacío con una pequeña ilustración vectorial del propio árbol. */
+    function emptyState(message) {
+        return '<div class="tree-empty-state">' +
+            '<svg class="tree-empty-art" viewBox="0 0 240 132" aria-hidden="true" focusable="false">' +
+                '<g fill="none" stroke="#cbd5e1" stroke-width="1.3" stroke-linecap="round">' +
+                    '<path d="M56 66 H90 M132 66 H160 M150 66 L186 40 M150 66 L186 94"/>' +
+                '</g>' +
+                '<g stroke-width="1.4">' +
+                    '<ellipse cx="38" cy="66" rx="26" ry="15" fill="#dbeafe" stroke="#3b82f6"/>' +
+                    '<ellipse cx="112" cy="66" rx="28" ry="15" fill="#ccfbf1" stroke="#14b8a6"/>' +
+                    '<ellipse cx="204" cy="38" rx="25" ry="14" fill="#cbd5e1" stroke="#475569"/>' +
+                    '<ellipse cx="204" cy="96" rx="25" ry="14" fill="#dcfce7" stroke="#22c55e"/>' +
+                '</g>' +
+                '<g font-family="Roboto Mono, monospace" font-size="11" text-anchor="middle">' +
+                    '<text x="38" y="70" fill="#1e3a8a">σ</text>' +
+                    '<text x="112" y="70" fill="#115e59">π</text>' +
+                    '<text x="204" y="42" fill="#0f172a">▦</text>' +
+                    '<text x="204" y="100" fill="#166534">#</text>' +
+                '</g>' +
+            '</svg>' +
+            '<p class="tree-empty">' + escapeHtml(message) + '</p>' +
+        '</div>';
+    }
 
     function setStatus(message, kind) {
         const box = el('treeModalStatus');
@@ -137,57 +145,32 @@ const TreeView = (() => {
             (node.children || []).forEach(child => collect(child.node));
         })(treeData);
 
-        Object.keys(legendLabels).forEach(category => {
+        Object.keys(legendMeta).forEach(category => {
             if (!categories.has(category)) return;
+            const meta = legendMeta[category];
             const chip = document.createElement('span');
             chip.className = 'tree-legend-chip';
-            const dot = document.createElement('span');
-            dot.className = 'tree-legend-dot';
-            dot.style.background = legendColors[category] || '#475569';
-            chip.appendChild(dot);
-            chip.appendChild(document.createTextNode(legendLabels[category]));
+            chip.title = meta.label + ': ' + meta.hint;
+
+            const symbol = document.createElement('span');
+            symbol.className = 'tree-legend-symbol';
+            symbol.style.setProperty('--chip-fill', meta.fill);
+            symbol.style.setProperty('--chip-border', meta.border);
+            symbol.style.setProperty('--chip-ink', meta.ink);
+            symbol.textContent = meta.symbol;
+
+            const copy = document.createElement('span');
+            copy.className = 'tree-legend-copy';
+            const strong = document.createElement('strong');
+            strong.textContent = meta.label;
+            const small = document.createElement('small');
+            small.textContent = meta.hint;
+            copy.append(strong, small);
+
+            chip.append(symbol, copy);
             legend.appendChild(chip);
         });
         legend.classList.toggle('hidden', legend.childElementCount === 0);
-    }
-
-    /* Graphviz dibuja las cajas con esquinas redondeadas demasiado amplias.
-       Se sustituye cada caja por un rectángulo con radio pequeño y uniforme. */
-    function roundNodeCorners(svg) {
-        svg.querySelectorAll('g.node').forEach(group => {
-            const shape = group.querySelector('polygon, path');
-            if (!shape) return;
-            if (shape.tagName.toLowerCase() === 'polygon') {
-                const points = (shape.getAttribute('points') || '').trim().split(/\s+/).filter(Boolean);
-                // Graphviz repite el primer punto al final del polígono.
-                const unique = points.length > 1 && points[0] === points[points.length - 1]
-                    ? points.slice(0, -1)
-                    : points;
-                if (unique.length !== 4) return;
-            }
-            let box;
-            try {
-                box = shape.getBBox();
-            } catch (error) {
-                return;
-            }
-            if (!box || box.width <= 0 || box.height <= 0) return;
-
-            const rect = document.createElementNS(NS, 'rect');
-            rect.setAttribute('x', box.x);
-            rect.setAttribute('y', box.y);
-            rect.setAttribute('width', box.width);
-            rect.setAttribute('height', box.height);
-            rect.setAttribute('rx', '5');
-            rect.setAttribute('ry', '5');
-            ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'fill-opacity', 'stroke-opacity']
-                .forEach(attribute => {
-                    if (shape.hasAttribute(attribute)) {
-                        rect.setAttribute(attribute, shape.getAttribute(attribute));
-                    }
-                });
-            shape.replaceWith(rect);
-        });
     }
 
     async function renderDiagram() {
@@ -221,7 +204,6 @@ const TreeView = (() => {
             svgElement.setAttribute('preserveAspectRatio', 'xMidYMin meet');
             svgElement.style.maxWidth = 'none';
             svgElement.style.display = 'block';
-            roundNodeCorners(svgElement);
             svgElement.setAttribute('role', 'img');
             svgElement.setAttribute('aria-label', 'Árbol sintáctico de la expresión de álgebra relacional');
             renderedDot = dotSource;
@@ -285,7 +267,7 @@ const TreeView = (() => {
         setOpenEnabled(false);
         const canvas = el('treeModalCanvas');
         if (canvas) {
-            canvas.innerHTML = '<p class="tree-empty">' + escapeHtml(message || 'Esperando consulta...') + '</p>';
+            canvas.innerHTML = emptyState(message || 'Esperando consulta...');
         }
         const legend = el('treeModalLegend');
         if (legend) {

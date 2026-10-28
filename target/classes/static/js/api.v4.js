@@ -21,5 +21,7 @@ const API = {
             body: JSON.stringify({ expression, database })
         });
         return r.json();
-    }
+    },
+    async history() { return (await fetch('/api/history')).json(); },
+    async clearHistory() { return (await fetch('/api/history/clear', { method: 'POST' })).json(); }
 };

@@ -33,7 +33,7 @@ public class SelectNode extends Expression {
 
     @Override
     public Map<String, Object> toTree() {
-        return TreeNode.of("σ", "Selección", "select", List.of(
+        return TreeNode.of("σ", "Filtra filas", "select", List.of(
                 TreeNode.child(condition.toTree(), "condición"),
                 TreeNode.child(source.toTree(), "relación")));
     }

@@ -37,6 +37,6 @@ public class TableNode extends Expression {
 
     @Override
     public Map<String, Object> toTree() {
-        return TreeNode.leaf(name, "Relación base", "table");
+        return TreeNode.leaf(name, "Tabla del esquema", "table");
     }
 }

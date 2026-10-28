@@ -5,9 +5,10 @@ import java.util.Map;
 
 /**
  * Genera la representación DOT (Graphviz) del árbol sintáctico a partir de la
- * estructura que expone cada nodo del AST. El diagrama se dibuja de arriba
- * hacia abajo y cada nodo recibe un identificador único con el formato
- * N00001, N00002, etc., tal como se describe en la documentación del proyecto.
+ * estructura que expone cada nodo del AST. El diagrama se dibuja de izquierda
+ * (raíz) a derecha (hojas), con nodos elípticos, y cada nodo recibe un
+ * identificador único con el formato N00001, N00002, etc., tal como se describe
+ * en la documentación del proyecto.
  *
  * <p>Los nodos usan un relleno suave con texto oscuro y borde de color, de modo
  * que el diagrama conserve la paleta institucional sin perder legibilidad.</p>
@@ -43,10 +44,10 @@ public final class DotTreeBuilder {
     public static String build(Map<String, Object> root) {
         StringBuilder dot = new StringBuilder();
         dot.append("digraph ArbolSintactico {\n");
-        dot.append("  graph [rankdir=TB, bgcolor=\"transparent\", pad=\"0.2\", ")
-           .append("nodesep=\"0.34\", ranksep=\"0.46\", splines=polyline];\n");
-        dot.append("  node [shape=box, style=\"filled\", fontname=\"Helvetica\", ")
-           .append("fontsize=11, margin=\"0.2,0.11\", penwidth=1.1];\n");
+        dot.append("  graph [rankdir=LR, bgcolor=\"transparent\", pad=\"0.3\", ")
+           .append("nodesep=\"0.32\", ranksep=\"0.8\", splines=polyline];\n");
+        dot.append("  node [shape=ellipse, style=\"filled\", fontname=\"Helvetica\", ")
+           .append("fontsize=11, margin=\"0.18,0.08\", penwidth=1.2];\n");
         dot.append("  edge [color=\"#94a3b8\", penwidth=1.1, arrowsize=0.7, ")
            .append("fontname=\"Helvetica\", fontsize=8.5, fontcolor=\"#64748b\"];\n");
         walk(root, dot, new int[] { 1 });

@@ -38,6 +38,6 @@ public class AttributeNode extends ScalarExpression {
     @Override
     public Map<String, Object> toTree() {
         String label = table == null ? name : table + "." + name;
-        return TreeNode.leaf(label, "Atributo", "attribute");
+        return TreeNode.leaf(label, "Columna de tabla", "attribute");
     }
 }

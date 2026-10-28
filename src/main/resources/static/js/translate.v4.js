@@ -7,6 +7,7 @@ const Translate = (() => {
     let lastExpression = '';
     let lastTableHtml = '';
     let lastTableInfo = '';
+    let activeVariables = [];
 
     function el(id) { return document.getElementById(id); }
 
@@ -108,6 +109,125 @@ const Translate = (() => {
         box.innerHTML = '';
     }
 
+    function clearBreakdown() {
+        const section = el('sqlBreakdown');
+        const body = el('sqlBreakdownBody');
+        const badge = el('sqlBreakdownBadge');
+        if (body) body.innerHTML = '';
+        if (badge) badge.textContent = '0 variables';
+        if (section) section.classList.add('hidden');
+    }
+
+    /**
+     * Muestra, justo antes del pie de página, el SQL de cada variable implicada
+     * y el SQL final con las sustituciones. Solo se llama cuando la expresión
+     * procesada utiliza variables.
+     */
+    function renderBreakdown(data) {
+        const section = el('sqlBreakdown');
+        const body = el('sqlBreakdownBody');
+        const badge = el('sqlBreakdownBadge');
+        if (!section || !body) return;
+
+        const items = data && data.usesVariables && Array.isArray(data.breakdown) ? data.breakdown : [];
+        if (!items.length || !data.usesVariables) {
+            clearBreakdown();
+            return;
+        }
+
+        const defined = items.filter(item => item.defined).length;
+        if (badge) {
+            badge.textContent = defined === 1 ? '1 variable' : defined + ' variables';
+        }
+
+        let html = '<div class="sql-breakdown-grid">';
+        items.forEach(item => {
+            const isDefined = !!item.defined;
+            html += '<article class="sql-breakdown-card' + (isDefined ? '' : ' is-missing') + '">' +
+                '<header class="sql-breakdown-card-head">' +
+                    '<span class="sql-breakdown-var">' + escapeHtml(item.name) + '</span>' +
+                    '<span class="sql-breakdown-tag">' +
+                        (isDefined ? 'Variable guardada' : 'Variable sin definir') +
+                    '</span>' +
+                '</header>' +
+                '<pre class="sql-breakdown-code">' +
+                    escapeHtml(isDefined ? (item.sql || '--') : 'No existe una relación guardada para ' + item.name + '.') +
+                '</pre>' +
+            '</article>';
+        });
+        html += '</div>';
+
+        html += '<div class="sql-breakdown-final">' +
+            '<div class="sql-breakdown-final-head">' +
+                '<i class="bi bi-check2-circle" aria-hidden="true"></i>' +
+                '<span>SQL final con las variables sustituidas</span>' +
+            '</div>' +
+            '<pre class="sql-breakdown-code">' + escapeHtml(data.sql || '--') + '</pre>' +
+        '</div>';
+
+        body.innerHTML = html;
+        section.classList.remove('hidden');
+    }
+
+    /**
+     * Historial activo de variables. Cada variable se puede insertar en el
+     * editor con un clic para reutilizarla en expresiones complejas.
+     */
+    function renderHistory(history) {
+        activeVariables = Array.isArray(history) ? history : [];
+        const container = el('historyKeys');
+        const hint = el('historyHint');
+        const clearButton = el('clearHistoryBtn');
+        if (clearButton) clearButton.disabled = activeVariables.length === 0;
+        if (!container) return;
+
+        container.innerHTML = '';
+        if (activeVariables.length === 0) {
+            const empty = document.createElement('span');
+            empty.className = 'history-empty';
+            empty.textContent = 'Guarda una relación para reutilizarla como @n.';
+            container.appendChild(empty);
+            if (hint) hint.textContent = 'Ninguna variable activa';
+            return;
+        }
+
+        if (hint) {
+            hint.textContent = activeVariables.length === 1
+                ? '1 variable disponible'
+                : activeVariables.length + ' variables disponibles';
+        }
+        activeVariables.forEach(item => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'history-chip';
+            button.textContent = item.name;
+            button.title = 'Insertar ' + item.name + ' en el editor';
+            button.addEventListener('click', () => {
+                Editor.insert(item.name);
+                Editor.focus();
+            });
+            container.appendChild(button);
+        });
+    }
+
+    async function refreshHistory() {
+        try {
+            const data = await API.history();
+            renderHistory(data.history);
+        } catch (error) {
+            renderHistory([]);
+        }
+    }
+
+    function nextVariableName() {
+        let max = 0;
+        activeVariables.forEach(item => {
+            const match = /^@(\d+)$/.exec(item.name || '');
+            if (match) max = Math.max(max, Number(match[1]));
+        });
+        return '@' + (max + 1);
+    }
+
     function renderTable(execution) {
         const container = el('resultTableContainer');
         const execInfo = el('execInfo');
@@ -161,6 +281,7 @@ const Translate = (() => {
         }
         lastExpression = expression;
         clearError();
+        clearBreakdown();
         Editor.clearMarkers();
         el('sqlEquivOutput').textContent = 'Procesando...';
         const copyButton = el('copySqlBtn');
@@ -180,6 +301,8 @@ const Translate = (() => {
                 el('sqlEquivOutput').textContent = data.sql || '--';
                 if (copyButton) copyButton.disabled = false;
                 if (typeof TreeView !== 'undefined') TreeView.setTree(data.treeDot, data.treeData);
+                renderBreakdown(data);
+                renderHistory(data.history);
                 renderTable(data.execution);
             } else {
                 renderError(data);
@@ -191,6 +314,8 @@ const Translate = (() => {
                 el('resultTableContainer').innerHTML = '<span class="text-red-700 text-xs">No se pudo ejecutar.</span>';
                 lastTableHtml = '';
                 setExpandEnabled(false);
+                clearBreakdown();
+                renderHistory(data.history);
             }
         } catch (error) {
             renderError({ message: 'Error de conexión: ' + error.message });
@@ -199,6 +324,7 @@ const Translate = (() => {
             el('resultTableContainer').innerHTML = '<span class="text-red-700 text-xs">Error de conexión.</span>';
             lastTableHtml = '';
             setExpandEnabled(false);
+            clearBreakdown();
         }
     }
 
@@ -222,8 +348,48 @@ const Translate = (() => {
         }
     }
 
+    async function save() {
+        const expression = Editor.getValue().trim();
+        if (!expression) {
+            alert('Primero escribe o traduce una expresión de álgebra relacional.');
+            Editor.focus();
+            return;
+        }
+        if (/^@\d+\s*<-/.test(expression)) {
+            alert('La expresión ya es una asignación. Para guardarla, usa otra variable o edítala antes de guardar.');
+            return;
+        }
+        const suggested = nextVariableName();
+        const varName = prompt('Nombre de la variable (formato @n):', suggested);
+        if (!varName) return;
+        const cleanName = varName.trim();
+        if (!/^@[0-9]+$/.test(cleanName)) {
+            alert('La variable debe tener el formato @n (por ejemplo @1).');
+            return;
+        }
+        if (activeVariables.some(item => item.name === cleanName)) {
+            const overwrite = confirm(cleanName + ' ya existe. ¿Deseas reemplazar su relación guardada?');
+            if (!overwrite) return;
+        }
+        Editor.setValue(cleanName + ' <- ' + expression);
+        await run();
+    }
+
+    async function clearHistory() {
+        if (!activeVariables.length) return;
+        if (!confirm('¿Limpiar todas las variables guardadas en esta sesión?')) return;
+        try {
+            const data = await API.clearHistory();
+            renderHistory(data.history);
+            clearBreakdown();
+            alert(data.message || 'Historial limpiado.');
+        } catch (error) {
+            renderError({ message: 'No se pudo limpiar el historial: ' + error.message });
+        }
+    }
+
     return {
-        run, copySql, getLast, initResultModal,
+        run, save, clearHistory, refreshHistory, copySql, getLast, initResultModal,
         setExpression: (v) => Editor.setValue(v)
     };
 })();

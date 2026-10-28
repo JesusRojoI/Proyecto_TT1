@@ -18,11 +18,23 @@ import java.util.*;
 public class TranslationService {
 
     /**
-     * Relaciones temporales creadas con la forma {@code @n <- ...}. Se conserva
-     * únicamente para resolver variables dentro de una expresión; no se expone
-     * como historial en la interfaz.
+     * Relaciones temporales creadas con la forma {@code @n <- ...}. Para cada
+     * variable se guarda la relación ya expandida y las variables de las que
+     * depende, de modo que la interfaz pueda mostrar el desglose del SQL y el
+     * árbol completo de la relación.
      */
-    private final Map<String, Expression> history = new LinkedHashMap<>();
+    private final Map<String, HistoryEntry> history = new LinkedHashMap<>();
+
+    /**
+     * Definición de una variable tal como existía cuando otra relación la usó.
+     * Se conserva una instantánea para que el desglose siga siendo fiel aunque
+     * la variable se reasigne después.
+     */
+    private record Definition(String name, boolean defined, String sql) {
+    }
+
+    private record HistoryEntry(Expression expression, List<Definition> dependencies) {
+    }
 
     /**
      * Procesa una expresión de álgebra relacional: la tokeniza, la analiza
@@ -68,27 +80,146 @@ public class TranslationService {
         }
 
         String saved = null;
-        Expression treeAst = ast;
+        Expression body = ast;
         if (ast instanceof AssignNode assign) {
             saved = assign.getName();
-            ast = assign.getBody();
-        }
-        ast = ast.expand(history);
-        if (saved != null) {
-            history.put(saved, ast);
+            body = assign.getBody();
         }
 
+        /* Las variables se recopilan antes de expandir para saber si la
+           expresión procesada realmente las utiliza. */
+        List<String> usedVariables = collectVariables(body.toTree());
+        Expression expandedBody = body.expand(expandableHistory());
+        if (saved != null) {
+            List<Definition> snapshot = buildBreakdown(usedVariables).stream()
+                    .map(item -> new Definition(
+                            (String) item.get("name"),
+                            (Boolean) item.get("defined"),
+                            (String) item.get("sql")))
+                    .toList();
+            history.put(saved, new HistoryEntry(expandedBody, snapshot));
+        }
+
+        /* El árbol debe mostrar la relación completa: si hubo asignación se
+           conserva esa etiqueta, pero su cuerpo ya contiene las variables
+           sustituidas por las relaciones guardadas. */
+        Expression treeAst = saved != null ? new AssignNode(saved, expandedBody) : expandedBody;
         Map<String, Object> treeData = treeAst.toTree();
+
         response.put("status", "success");
-        response.put("sql", ast.asQuery());
+        response.put("sql", expandedBody.asQuery());
         response.put("tree", treeAst.toTreeString(0));
         response.put("treeData", treeData);
         response.put("treeDot", DotTreeBuilder.build(treeData));
         response.put("tokens", tokens);
+        response.put("usesVariables", !usedVariables.isEmpty());
+        response.put("breakdown", buildBreakdown(usedVariables));
+        response.put("history", historyEntries());
         if (saved != null) {
             response.put("saved", saved);
         }
         return response;
+    }
+
+    /** Relaciones activas, con su SQL expandido, para el historial de la UI. */
+    public synchronized List<Map<String, Object>> historyEntries() {
+        List<Map<String, Object>> entries = new ArrayList<>();
+        history.forEach((name, entry) -> {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("name", name);
+            item.put("sql", entry.expression().asQuery());
+            item.put("dependencies", entry.dependencies().stream().map(Definition::name).toList());
+            entries.add(item);
+        });
+        return entries;
+    }
+
+    /** Elimina todas las relaciones guardadas durante la sesión. */
+    public synchronized void clearHistory() {
+        history.clear();
+    }
+
+    private Map<String, Expression> expandableHistory() {
+        Map<String, Expression> expressions = new LinkedHashMap<>();
+        history.forEach((name, entry) -> expressions.put(name, entry.expression()));
+        return expressions;
+    }
+
+    /**
+     * Recorre la representación del árbol y devuelve las variables referenciadas
+     * en orden de aparición, sin duplicados.
+     */
+    @SuppressWarnings("unchecked")
+    private static List<String> collectVariables(Map<String, Object> root) {
+        List<String> names = new ArrayList<>();
+        collectVariables(root, names);
+        return names;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void collectVariables(Map<String, Object> node, List<String> names) {
+        if (node == null) {
+            return;
+        }
+        if ("variable".equals(node.get("category"))) {
+            String name = String.valueOf(node.get("label"));
+            if (!name.isBlank() && !names.contains(name)) {
+                names.add(name);
+            }
+        }
+        Object rawChildren = node.get("children");
+        if (rawChildren instanceof List<?> children) {
+            for (Object child : children) {
+                if (child instanceof Map<?, ?> wrapper) {
+                    Object rawNode = wrapper.get("node");
+                    if (rawNode instanceof Map<?, ?> childNode) {
+                        collectVariables((Map<String, Object>) childNode, names);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Desglose del SQL: primero las dependencias de cada variable y después la
+     * variable utilizada. Las variables sin definir se conservan para que la
+     * interfaz pueda señalarlas.
+     */
+    private List<Map<String, Object>> buildBreakdown(List<String> usedVariables) {
+        List<Map<String, Object>> breakdown = new ArrayList<>();
+        Set<String> visited = new LinkedHashSet<>();
+        for (String name : usedVariables) {
+            appendBreakdown(name, visited, breakdown);
+        }
+        return breakdown;
+    }
+
+    private void appendBreakdown(String name, Set<String> visited,
+                                 List<Map<String, Object>> breakdown) {
+        if (name == null || visited.contains(name)) {
+            return;
+        }
+        HistoryEntry entry = history.get(name);
+        if (entry == null) {
+            visited.add(name);
+            breakdown.add(definitionItem(new Definition(name, false, null)));
+            return;
+        }
+        for (Definition dependency : entry.dependencies()) {
+            if (visited.add(dependency.name())) {
+                breakdown.add(definitionItem(dependency));
+            }
+        }
+        visited.add(name);
+        breakdown.add(definitionItem(new Definition(name, true, entry.expression().asQuery())));
+    }
+
+    private static Map<String, Object> definitionItem(Definition definition) {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("name", definition.name());
+        item.put("defined", definition.defined());
+        item.put("sql", definition.sql());
+        return item;
     }
 
     private void tokenize(String expression, List<Map<String, Object>> out) throws IOException {
@@ -132,6 +263,9 @@ public class TranslationService {
             response.put("expected", expected);
         }
         response.put("tokens", tokens);
+        response.put("usesVariables", false);
+        response.put("breakdown", List.of());
+        response.put("history", historyEntries());
         return response;
     }
 

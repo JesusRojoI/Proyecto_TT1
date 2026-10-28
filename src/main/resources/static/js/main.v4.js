@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* ---------- Botones de acción ---------- */
     document.getElementById('translateBtn').addEventListener('click', () => Translate.run());
+    const saveButton = document.getElementById('saveBtn');
+    if (saveButton) saveButton.addEventListener('click', () => Translate.save());
+    const clearHistoryButton = document.getElementById('clearHistoryBtn');
+    if (clearHistoryButton) clearHistoryButton.addEventListener('click', () => Translate.clearHistory());
     const copyButton = document.getElementById('copySqlBtn');
     if (copyButton) copyButton.addEventListener('click', () => Translate.copySql());
     if (typeof Translate.initResultModal === 'function') Translate.initResultModal();
@@ -39,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await Editor.init();
     if (typeof TreeView !== 'undefined') TreeView.init();
     await Connection.init();
+    if (typeof Translate.refreshHistory === 'function') await Translate.refreshHistory();
 
     /* Atajo de teclado: Escape cierra paneles. */
     document.addEventListener('keydown', (e) => {

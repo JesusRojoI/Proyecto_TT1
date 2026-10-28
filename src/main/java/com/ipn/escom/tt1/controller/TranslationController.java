@@ -43,4 +43,22 @@ public class TranslationController {
             return ResponseEntity.ok(error);
         }
     }
+
+    @GetMapping("/history")
+    public ResponseEntity<?> history() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("history", translationService.historyEntries());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/history/clear")
+    public ResponseEntity<?> clearHistory() {
+        translationService.clearHistory();
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Historial limpiado.");
+        response.put("history", translationService.historyEntries());
+        return ResponseEntity.ok(response);
+    }
 }
