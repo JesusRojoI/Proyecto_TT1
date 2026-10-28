@@ -1,5 +1,7 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.Map;
+
 /**
  * Relación base: una tabla de la base de datos seleccionada.
  */
@@ -31,5 +33,10 @@ public class TableNode extends Expression {
     @Override
     public String toTreeString(int level) {
         return "  ".repeat(level) + "Tabla: " + name + "\n";
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.leaf(name, "Tabla", "table");
     }
 }

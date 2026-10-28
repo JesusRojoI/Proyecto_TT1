@@ -1,5 +1,8 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Comparación entre dos expresiones escalares. El operador se almacena con el
  * símbolo de la gramática ({@code >}, {@code >=}, {@code <}, {@code <=},
@@ -47,5 +50,12 @@ public class CompareNode extends ScalarExpression {
         return "  ".repeat(level) + "Comparacion: " + name() + " (" + operator + ")\n" +
                left.toTreeString(level + 1) +
                right.toTreeString(level + 1);
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.of(operator, name(), "compare", List.of(
+                TreeNode.child(left.toTree(), "izquierda"),
+                TreeNode.child(right.toTree(), "derecha")));
     }
 }

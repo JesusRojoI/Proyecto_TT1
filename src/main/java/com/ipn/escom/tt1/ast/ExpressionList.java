@@ -2,6 +2,7 @@ package com.ipn.escom.tt1.ast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +38,14 @@ public class ExpressionList extends ScalarExpression {
             sb.append(e.toTreeString(level + 1));
         }
         return sb.toString();
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        List<Map<String, Object>> children = expressions.stream()
+                .map(e -> TreeNode.child(e.toTree()))
+                .toList();
+        return TreeNode.of("lista", expressions.size() + " elemento(s)", "list", children);
     }
 }
 

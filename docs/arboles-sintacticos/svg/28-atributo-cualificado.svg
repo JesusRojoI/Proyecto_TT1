@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1736" height="865" viewBox="0 0 1736 865">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.16"/></filter><linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2563eb"/><stop offset="0.5" stop-color="#0d9488"/><stop offset="1" stop-color="#7e22ce"/></linearGradient></defs>
+<rect width="1736" height="865" fill="#ffffff"/>
+<rect x="0" y="0" width="1736" height="7" fill="url(#accent)"/>
+<text x="56" y="74" font-family="DejaVu Sans" font-weight="bold" font-size="12" letter-spacing="1.6" fill="#64748b">ÁLGEBRA RELACIONAL · TT1 · ÁRBOL DE SINTAXIS</text>
+<text x="56" y="119" font-family="DejaVu Sans" font-weight="bold" font-size="29" fill="#0f172a">Atributo cualificado (tabla.atributo)</text>
+<rect x="56" y="135" width="1623.671875" height="78" rx="12" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="56" y="135" width="4" height="78" rx="2" fill="#2563eb"/>
+<text x="78" y="162" font-family="DejaVu Sans" font-size="15" fill="#0f172a">σ(Estudiantes.edad &gt; Inscripciones.edad)(JOIN(Estudiantes,</text>
+<text x="78" y="183" font-family="DejaVu Sans" font-size="15" fill="#0f172a">Inscripciones, Estudiantes.matricula == Inscripciones.matricula))</text>
+<text x="56" y="243" font-family="DejaVu Sans" font-size="13" fill="#475569">El atributo cualificado evita ambigüedades cuando varias tablas comparten columnas.</text>
+<text x="56" y="269" font-family="DejaVu Sans" font-size="11" fill="#94a3b8">Producción: expr ::= QUALIFIED</text>
+<path d="M 670.3 373.0 C 670.3 402.0, 303.4 402.0, 303.4 431.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="453.5" y="397.0" width="66.6" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="486.9" y="409.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">condición</text>
+<path d="M 303.4 487.0 C 303.4 516.0, 160.3 516.0, 160.3 545.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="199.5" y="511.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="231.8" y="523.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 303.4 487.0 C 303.4 516.0, 446.5 516.0, 446.5 545.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="345.7" y="511.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="375.0" y="523.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 670.3 373.0 C 670.3 402.0, 1037.2 402.0, 1037.2 431.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="828.9" y="397.0" width="49.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="853.7" y="409.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">fuente</text>
+<path d="M 1037.2 487.0 C 1037.2 516.0, 701.1 516.0, 701.1 545.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="836.8" y="511.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="869.2" y="523.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 1037.2 487.0 C 1037.2 516.0, 924.1 516.0, 924.1 545.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="951.4" y="511.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="980.6" y="523.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 1037.2 487.0 C 1037.2 516.0, 1373.2 516.0, 1373.2 545.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="1171.9" y="511.0" width="66.6" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1205.2" y="523.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">condición</text>
+<path d="M 1373.2 601.0 C 1373.2 630.0, 1204.4 630.0, 1204.4 659.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="1256.5" y="625.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1288.8" y="637.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 1373.2 601.0 C 1373.2 630.0, 1542.0 630.0, 1542.0 659.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="1428.3" y="625.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1457.6" y="637.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<g><rect x="614.3" y="317.0" width="112.0" height="56" rx="11" fill="#2563eb" stroke="#2563eb" filter="url(#shadow)"/>
+<text x="670.3" y="341.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">σ</text>
+<text x="670.3" y="359.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Selección</text>
+</g>
+<g><rect x="247.4" y="431.0" width="112.0" height="56" rx="11" fill="#be123c" stroke="#be123c" filter="url(#shadow)"/>
+<text x="303.4" y="455.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">&gt;</text>
+<text x="303.4" y="473.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Mayor que</text>
+</g>
+<g><rect x="40.0" y="545.0" width="240.6" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="160.3" y="569.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Estudiantes.edad</text>
+<text x="160.3" y="587.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="318.6" y="545.0" width="255.9" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="446.5" y="569.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Inscripciones.edad</text>
+<text x="446.5" y="587.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="979.0" y="431.0" width="116.3" height="56" rx="11" fill="#6d28d9" stroke="#6d28d9" filter="url(#shadow)"/>
+<text x="1037.2" y="455.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">⋈</text>
+<text x="1037.2" y="473.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Reunión theta</text>
+</g>
+<g><rect x="612.5" y="545.0" width="177.3" height="56" rx="11" fill="#334155" stroke="#334155" filter="url(#shadow)"/>
+<text x="701.1" y="569.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Estudiantes</text>
+<text x="701.1" y="587.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Tabla</text>
+</g>
+<g><rect x="827.8" y="545.0" width="192.6" height="56" rx="11" fill="#334155" stroke="#334155" filter="url(#shadow)"/>
+<text x="924.1" y="569.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Inscripciones</text>
+<text x="924.1" y="587.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Tabla</text>
+</g>
+<g><rect x="1317.2" y="545.0" width="112.0" height="56" rx="11" fill="#be123c" stroke="#be123c" filter="url(#shadow)"/>
+<text x="1373.2" y="569.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">==</text>
+<text x="1373.2" y="587.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Igual a</text>
+</g>
+<g><rect x="1058.4" y="659.0" width="292.0" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="1204.4" y="683.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Estudiantes.matricula</text>
+<text x="1204.4" y="701.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="1388.4" y="659.0" width="307.3" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="1542.0" y="683.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Inscripciones.matricula</text>
+<text x="1542.0" y="701.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<line x1="56" y1="821" x2="1679.671875" y2="821" stroke="#e2e8f0" stroke-width="1"/>
+<text x="56" y="841" font-family="DejaVu Sans" font-size="11" fill="#94a3b8">Generado por el analizador sintáctico del proyecto · Sistema de Apoyo para la Enseñanza del Álgebra Relacional</text>
+<text x="1679.671875" y="841" text-anchor="end" font-family="DejaVu Sans Mono" font-size="11" fill="#94a3b8">28-atributo-cualificado</text>
+</svg>

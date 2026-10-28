@@ -1,5 +1,8 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Operación unaria: negación aritmética (menos unario) o negación lógica.
  */
@@ -26,5 +29,12 @@ public class UnaryNode extends ScalarExpression {
         String label = "NOT".equals(operator) ? "Negacion logica (NOT)" : "Menos unario (-)";
         return "  ".repeat(level) + label + "\n" +
                operand.toTreeString(level + 1);
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        boolean not = "NOT".equals(operator);
+        return TreeNode.of(not ? "¬" : "−", not ? "Negación lógica" : "Menos unario",
+                not ? "logic" : "arith", List.of(TreeNode.child(operand.toTree(), "operando")));
     }
 }

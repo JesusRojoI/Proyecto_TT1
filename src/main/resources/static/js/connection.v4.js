@@ -17,7 +17,7 @@ const Connection = (() => {
             ok: 'text-emerald-700',
             error: 'text-red-700'
         };
-        box.className = 'text-xs ' + (colors[kind] || colors.info);
+        box.className = 'connection-message text-xs ' + (colors[kind] || colors.info);
         box.textContent = message;
     }
 
@@ -81,6 +81,7 @@ const Connection = (() => {
         el('connectionInfo').classList.add('hidden');
         el('connectionBadge').classList.add('hidden');
         el('exampleSelect').innerHTML = '<option value="">-- Selecciona un ejemplo --</option>';
+        if (typeof Editor !== 'undefined') Editor.setDictionary(null);
         status('Conexión cerrada.', 'info');
         if (onChangeCallback) onChangeCallback('');
     }
@@ -120,6 +121,7 @@ const Connection = (() => {
             return;
         }
         el('dictionaryPanel').classList.add('open');
+        el('dictionaryPanel').setAttribute('aria-hidden', 'false');
         el('dictionaryOverlay').classList.add('open');
         el('dictionaryTitle').textContent = current;
         await loadDictionary();
@@ -127,6 +129,7 @@ const Connection = (() => {
 
     function closeDictionary() {
         el('dictionaryPanel').classList.remove('open');
+        el('dictionaryPanel').setAttribute('aria-hidden', 'true');
         el('dictionaryOverlay').classList.remove('open');
     }
 
@@ -135,9 +138,11 @@ const Connection = (() => {
         try {
             dictionary = await API.dictionary(current);
             if (dictionary.error) {
+                if (typeof Editor !== 'undefined') Editor.setDictionary(null);
                 el('dictionaryBody').innerHTML = '<p class="text-red-700 text-sm">' + escapeHtml(dictionary.error) + '</p>';
                 return;
             }
+            if (typeof Editor !== 'undefined') Editor.setDictionary(dictionary);
             buildExamples(dictionary);
             renderDictionary();
         } catch (e) {

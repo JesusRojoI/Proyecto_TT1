@@ -7,8 +7,8 @@ import java_cup.runtime.Symbol;
 /* =============================================================
    Analizador lexico del Algebra Relacional (TT1)
    Basado en la propuesta de DefExpRegLexi.flex del profesor,
-   ampliado con funciones matematicas/trigonometricas, cadenas,
-   comentarios y soporte de simbolos unicode (operadores griegos).
+   ampliado con funciones matematicas, cadenas, comentarios y
+   soporte de simbolos unicode (operadores griegos).
    ============================================================= */
 
 %class Lexer
@@ -121,19 +121,9 @@ Number         = {Digit}+("."{Digit}+)?([eE][+-]?{Digit}+)?
 ","                 { return symbol(sym.COMMA, yytext()); }
 ";"                 { return symbol(sym.SEMICOLON, yytext()); }
 
-/* ---------- Funciones trigonometricas y matematicas ---------- */
-"sin"               { return symbol(sym.FUNCTION, "SIN"); }
-"cos"               { return symbol(sym.FUNCTION, "COS"); }
-"tan"               { return symbol(sym.FUNCTION, "TAN"); }
-"asin"              { return symbol(sym.FUNCTION, "ASIN"); }
-"acos"              { return symbol(sym.FUNCTION, "ACOS"); }
-"atan"              { return symbol(sym.FUNCTION, "ATAN"); }
-"atan2"             { return symbol(sym.FUNCTION, "ATAN2"); }
+/* ---------- Funciones matemáticas ---------- */
 "sqrt"              { return symbol(sym.FUNCTION, "SQRT"); }
 "raiz"              { return symbol(sym.FUNCTION, "SQRT"); }
-"log"               { return symbol(sym.FUNCTION, "LOG"); }
-"ln"                { return symbol(sym.FUNCTION, "LN"); }
-"exp"               { return symbol(sym.FUNCTION, "EXP"); }
 "abs"               { return symbol(sym.FUNCTION, "ABS"); }
 "floor"             { return symbol(sym.FUNCTION, "FLOOR"); }
 "ceil"              { return symbol(sym.FUNCTION, "CEIL"); }

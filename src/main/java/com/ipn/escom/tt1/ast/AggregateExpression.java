@@ -1,5 +1,8 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Función de agregación (SUM, PROM/AVG, MAX, MIN, COUNT). Puede operar sobre
  * una expresión o sobre {@code *} (COUNT(*)&nbsp;).
@@ -33,5 +36,14 @@ public class AggregateExpression extends ScalarExpression {
             sb.append(argument.toTreeString(level + 1));
         }
         return sb.toString();
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        if (star) {
+            return TreeNode.of(name + "(*)", "Agregación", "aggregate", List.of());
+        }
+        return TreeNode.of(name + "()", "Agregación", "aggregate", List.of(
+                TreeNode.child(argument.toTree(), "sobre")));
     }
 }

@@ -5,80 +5,78 @@
    - Si Monaco no está disponible (sin internet), usa un textarea.
    ============================================================= */
 
-/* Catálogo único de operadores: se usa para los botones y para los tooltips. */
+/* Catálogo único de operadores: se usa para los botones y para los tooltips.
+   Las funciones trigonométricas y log()/exp() se retiraron del lenguaje. */
 const AR_OPERATORS = [
-    { sym: 'σ', insert: 'σ()(', back: 2, title: 'Selección (σ)', keywords: ['sigma', 'selec', 'seleccion'],
+    { sym: 'σ', insert: 'σ()(', back: 2, group: 'relacional', title: 'Selección (σ)', keywords: ['sigma', 'selec', 'seleccion'],
       desc: 'Filtra las tuplas de una relación que cumplen una condición.', example: 'σ(edad > 18)(Estudiantes)' },
-    { sym: 'π', insert: 'π()(', back: 2, title: 'Proyección (π)', keywords: ['pi', 'proy', 'proyeccion'],
+    { sym: 'π', insert: 'π()(', back: 2, group: 'relacional', title: 'Proyección (π)', keywords: ['pi', 'proy', 'proyeccion'],
       desc: 'Selecciona un subconjunto de atributos de una relación.', example: 'π(nombre, edad)(Estudiantes)' },
-    { sym: '⋈', insert: ' ⋈ ', back: 0, title: 'Reunión (⋈)', keywords: ['join'],
-      desc: 'Combina dos relaciones. Forma natural: R ⋈ S. Forma con condición: JOIN(R, S, cond).', example: 'Estudiantes ⋈ Inscripciones' },
-    { sym: '∪', insert: ' ∪ ', back: 0, title: 'Unión (∪)', keywords: ['union'],
-      desc: 'Devuelve las tuplas presentes en cualquiera de las dos relaciones.', example: 'Estudiantes ∪ Egresados' },
-    { sym: '∩', insert: ' ∩ ', back: 0, title: 'Intersección (∩)', keywords: ['inter', 'intersec', 'interseccion'],
-      desc: 'Devuelve las tuplas comunes a ambas relaciones.', example: 'Estudiantes ∩ Egresados' },
-    { sym: '−', insert: ' − ', back: 0, title: 'Diferencia (−)', keywords: ['dif', 'diferencia'],
-      desc: 'Devuelve las tuplas de la primera relación que no están en la segunda.', example: 'Estudiantes − Egresados' },
-    { sym: '×', insert: ' × ', back: 0, title: 'Producto cartesiano (×)', keywords: ['prodcart', 'producto'],
-      desc: 'Combina cada tupla de la primera relación con cada tupla de la segunda.', example: 'Estudiantes × Carreras' },
-    { sym: 'γ', insert: 'γ(; )()', back: 6, title: 'Agrupación (γ)', keywords: ['agrupar', 'agrup'],
+    { sym: 'γ', insert: 'γ(; )()', back: 6, group: 'relacional', title: 'Agrupación (γ)', keywords: ['agrupar', 'agrup'],
       desc: 'Agrupa por atributos y calcula funciones de agregación.', example: 'γ(carrera_id; COUNT(*))(Estudiantes)' },
-    { sym: 'Σ', insert: 'SUM()', back: 1, title: 'Agregación SUM (Σ)', keywords: ['sum', 'suma'],
+    { sym: '⋈', insert: ' ⋈ ', back: 0, group: 'relacional', title: 'Reunión (⋈)', keywords: ['join'],
+      desc: 'Combina dos relaciones. Forma natural: R ⋈ S. Forma con condición: JOIN(R, S, cond).', example: 'Estudiantes ⋈ Inscripciones' },
+    { sym: '∪', insert: ' ∪ ', back: 0, group: 'conjuntos', title: 'Unión (∪)', keywords: ['union'],
+      desc: 'Devuelve las tuplas presentes en cualquiera de las dos relaciones.', example: 'Estudiantes ∪ Egresados' },
+    { sym: '∩', insert: ' ∩ ', back: 0, group: 'conjuntos', title: 'Intersección (∩)', keywords: ['inter', 'intersec', 'interseccion'],
+      desc: 'Devuelve las tuplas comunes a ambas relaciones.', example: 'Estudiantes ∩ Egresados' },
+    { sym: '−', insert: ' − ', back: 0, group: 'conjuntos', title: 'Diferencia (−)', keywords: ['dif', 'diferencia'],
+      desc: 'Devuelve las tuplas de la primera relación que no están en la segunda.', example: 'Estudiantes − Egresados' },
+    { sym: '×', insert: ' × ', back: 0, group: 'conjuntos', title: 'Producto cartesiano (×)', keywords: ['prodcart', 'producto'],
+      desc: 'Combina cada tupla de la primera relación con cada tupla de la segunda.', example: 'Estudiantes × Carreras' },
+    { sym: 'Σ', insert: 'SUM()', back: 1, group: 'agregacion', title: 'Agregación SUM (Σ)', keywords: ['sum', 'suma'],
       desc: 'Suma los valores de una columna.', example: 'γ(carrera_id; Σ(creditos))(Materias)' },
-    { sym: 'PROM', insert: 'AVG()', back: 1, title: 'Agregación AVG (PROM)', keywords: ['prom', 'promedio', 'avg'],
+    { sym: 'PROM', insert: 'AVG()', back: 1, group: 'agregacion', title: 'Agregación AVG (PROM)', keywords: ['prom', 'promedio', 'avg'],
       desc: 'Calcula el promedio de una columna.', example: 'γ(materia_id; PROM(calificacion))(Inscripciones)' },
-    { sym: 'MAX', insert: 'MAX()', back: 1, title: 'Agregación MAX', keywords: ['max'],
+    { sym: 'MAX', insert: 'MAX()', back: 1, group: 'agregacion', title: 'Agregación MAX', keywords: ['max'],
       desc: 'Obtiene el valor máximo de una columna.', example: 'γ(carrera_id; MAX(edad))(Estudiantes)' },
-    { sym: 'MIN', insert: 'MIN()', back: 1, title: 'Agregación MIN', keywords: ['min'],
+    { sym: 'MIN', insert: 'MIN()', back: 1, group: 'agregacion', title: 'Agregación MIN', keywords: ['min'],
       desc: 'Obtiene el valor mínimo de una columna.', example: 'γ(carrera_id; MIN(edad))(Estudiantes)' },
-    { sym: 'COUNT', insert: 'COUNT()', back: 1, title: 'Agregación COUNT', keywords: ['count', 'contar'],
+    { sym: 'COUNT', insert: 'COUNT()', back: 1, group: 'agregacion', title: 'Agregación COUNT', keywords: ['count', 'contar'],
       desc: 'Cuenta las tuplas o valores de una columna. Usa COUNT(*).', example: 'γ(carrera_id; COUNT(*))(Estudiantes)' },
-    { sym: '>', insert: ' > ', back: 0, title: 'Comparador mayor que (>)', keywords: [],
+    { sym: '>', insert: ' > ', back: 0, group: 'comparacion', title: 'Comparador mayor que (>)', keywords: [],
       desc: 'Compara dos expresiones: verdadero si la izquierda es mayor.', example: 'edad > 18' },
-    { sym: '>=', insert: ' >= ', back: 0, title: 'Comparador mayor o igual (>=)', keywords: [],
+    { sym: '>=', insert: ' >= ', back: 0, group: 'comparacion', title: 'Comparador mayor o igual (>=)', keywords: [],
       desc: 'Verdadero si la izquierda es mayor o igual que la derecha.', example: 'edad >= 18' },
-    { sym: '<', insert: ' < ', back: 0, title: 'Comparador menor que (<)', keywords: [],
+    { sym: '<', insert: ' < ', back: 0, group: 'comparacion', title: 'Comparador menor que (<)', keywords: [],
       desc: 'Verdadero si la izquierda es menor que la derecha.', example: 'edad < 30' },
-    { sym: '<=', insert: ' <= ', back: 0, title: 'Comparador menor o igual (<=)', keywords: [],
+    { sym: '<=', insert: ' <= ', back: 0, group: 'comparacion', title: 'Comparador menor o igual (<=)', keywords: [],
       desc: 'Verdadero si la izquierda es menor o igual que la derecha.', example: 'edad <= 30' },
-    { sym: '==', insert: ' == ', back: 0, title: 'Comparador de igualdad (==)', keywords: [],
+    { sym: '==', insert: ' == ', back: 0, group: 'comparacion', title: 'Comparador de igualdad (==)', keywords: [],
       desc: 'Verdadero si ambas expresiones son iguales.', example: 'carrera_id == 1' },
-    { sym: '!=', insert: ' != ', back: 0, title: 'Comparador de desigualdad (!=)', keywords: [],
+    { sym: '!=', insert: ' != ', back: 0, group: 'comparacion', title: 'Comparador de desigualdad (!=)', keywords: [],
       desc: 'Verdadero si las expresiones son distintas.', example: 'carrera_id != 1' },
-    { sym: '&&', insert: ' && ', back: 0, title: 'Conjunción lógica (&&)', keywords: ['and'],
+    { sym: '&&', insert: ' && ', back: 0, group: 'logica', title: 'Conjunción lógica (&&)', keywords: ['and'],
       desc: 'Verdadero si ambas condiciones se cumplen.', example: 'edad > 18 && carrera_id == 1' },
-    { sym: '||', insert: ' || ', back: 0, title: 'Disyunción lógica (||)', keywords: ['or'],
+    { sym: '||', insert: ' || ', back: 0, group: 'logica', title: 'Disyunción lógica (||)', keywords: ['or'],
       desc: 'Verdadero si al menos una condición se cumple.', example: 'edad < 18 || edad > 60' },
-    { sym: '!', insert: '!', back: 0, title: 'Negación lógica (!)', keywords: ['not'],
+    { sym: '!', insert: '!', back: 0, group: 'logica', title: 'Negación lógica (!)', keywords: ['not'],
       desc: 'Invierte el valor de una condición.', example: '!(carrera_id == 1)' },
-    { sym: '+', insert: ' + ', back: 0, title: 'Suma aritmética (+)', keywords: [],
+    { sym: '+', insert: ' + ', back: 0, group: 'aritmetica', title: 'Suma aritmética (+)', keywords: [],
       desc: 'Suma dos expresiones numéricas.', example: 'edad + 1' },
-    { sym: '*', insert: ' * ', back: 0, title: 'Multiplicación aritmética (*)', keywords: [],
+    { sym: '*', insert: ' * ', back: 0, group: 'aritmetica', title: 'Multiplicación aritmética (*)', keywords: [],
       desc: 'Multiplica dos expresiones numéricas.', example: 'creditos * 2' },
-    { sym: '/', insert: ' / ', back: 0, title: 'División aritmética (/)', keywords: [],
+    { sym: '/', insert: ' / ', back: 0, group: 'aritmetica', title: 'División aritmética (/)', keywords: [],
       desc: 'Divide dos expresiones numéricas.', example: 'total / cantidad' },
-    { sym: '^', insert: ' ^ ', back: 0, title: 'Potencia aritmética (^)', keywords: [],
+    { sym: '^', insert: ' ^ ', back: 0, group: 'aritmetica', title: 'Potencia aritmética (^)', keywords: [],
       desc: 'Eleva una expresión a una potencia.', example: 'edad ^ 2' },
-    { sym: 'sin()', insert: 'sin()', back: 1, title: 'Función seno', keywords: ['sin'],
-      desc: 'Seno de un ángulo (radianes).', example: 'σ(sin(x) > 0.5)(T)' },
-    { sym: 'cos()', insert: 'cos()', back: 1, title: 'Función coseno', keywords: ['cos'],
-      desc: 'Coseno de un ángulo (radianes).', example: 'π(cos(x))(T)' },
-    { sym: 'tan()', insert: 'tan()', back: 1, title: 'Función tangente', keywords: ['tan'],
-      desc: 'Tangente de un ángulo (radianes).', example: 'π(tan(x))(T)' },
-    { sym: 'asin()', insert: 'asin()', back: 1, title: 'Arco seno', keywords: ['asin'],
-      desc: 'Ángulo cuyo seno es el valor dado.', example: 'π(asin(x))(T)' },
-    { sym: 'acos()', insert: 'acos()', back: 1, title: 'Arco coseno', keywords: ['acos'],
-      desc: 'Ángulo cuyo coseno es el valor dado.', example: 'π(acos(x))(T)' },
-    { sym: 'atan()', insert: 'atan()', back: 1, title: 'Arco tangente', keywords: ['atan'],
-      desc: 'Ángulo cuya tangente es el valor dado.', example: 'π(atan(x))(T)' },
-    { sym: 'sqrt()', insert: 'sqrt()', back: 1, title: 'Raíz cuadrada', keywords: ['sqrt', 'raiz'],
+    { sym: 'sqrt()', insert: 'sqrt()', back: 1, group: 'funciones', title: 'Raíz cuadrada', keywords: ['sqrt', 'raiz'],
       desc: 'Raíz cuadrada de una expresión.', example: 'σ(sqrt(x) > 2)(T)' },
-    { sym: 'abs()', insert: 'abs()', back: 1, title: 'Valor absoluto', keywords: ['abs'],
-      desc: 'Valor absoluto de una expresión.', example: 'π(abs(x))(T)' },
-    { sym: 'log()', insert: 'log()', back: 1, title: 'Logaritmo', keywords: ['log', 'ln'],
-      desc: 'Logaritmo natural o en base 10.', example: 'π(log(x))(T)' },
-    { sym: 'exp()', insert: 'exp()', back: 1, title: 'Exponencial', keywords: ['exp'],
-      desc: 'Número e elevado a la expresión.', example: 'π(exp(x))(T)' }
+    { sym: 'abs()', insert: 'abs()', back: 1, group: 'funciones', title: 'Valor absoluto', keywords: ['abs'],
+      desc: 'Valor absoluto de una expresión.', example: 'π(abs(x))(T)' }
+];
+
+/* Tonos por categoría. Los botones de cada grupo conservan su color, pero se
+   muestran en un único panel fluido, sin etiquetas ni contenedores. */
+const AR_OPERATOR_GROUPS = [
+    { id: 'relacional', label: 'Relacionales', tone: '#4338ca' },
+    { id: 'conjuntos', label: 'Conjuntos', tone: '#0f766e' },
+    { id: 'agregacion', label: 'Agregación', tone: '#7e22ce' },
+    { id: 'comparacion', label: 'Comparadores', tone: '#be123c' },
+    { id: 'logica', label: 'Lógica', tone: '#b45309' },
+    { id: 'aritmetica', label: 'Aritmética', tone: '#c2410c' },
+    { id: 'funciones', label: 'Funciones', tone: '#047857' },
+    { id: 'sintaxis', label: 'Sintaxis', tone: '#475569' }
 ];
 
 const Editor = (() => {
@@ -86,13 +84,21 @@ const Editor = (() => {
     let textarea = null;
     let readyResolve;
     const ready = new Promise(res => { readyResolve = res; });
+    let dictionaryTables = [];
+    let attributeIndex = new Map();   // atributo -> [tablas]
+    let tableIndex = new Map();       // tabla -> [atributos]
 
     const DELIMITERS = [
-        { sym: '(', insert: '(', back: 0 },
-        { sym: ')', insert: ')', back: 0 },
-        { sym: ',', insert: ', ', back: 0 },
-        { sym: ';', insert: '; ', back: 0 },
-        { sym: '""', insert: '""', back: 1 }
+        { sym: '(', insert: '(', back: 0, group: 'sintaxis', title: 'Paréntesis que abre',
+          desc: 'Inicia una condición, lista de atributos o subexpresión.' },
+        { sym: ')', insert: ')', back: 0, group: 'sintaxis', title: 'Paréntesis que cierra',
+          desc: 'Cierra una condición, lista de atributos o subexpresión.' },
+        { sym: ',', insert: ', ', back: 0, group: 'sintaxis', title: 'Separador (coma)',
+          desc: 'Separa atributos, condiciones o relaciones.' },
+        { sym: ';', insert: '; ', back: 0, group: 'sintaxis', title: 'Separador (punto y coma)',
+          desc: 'Separa los atributos de agrupación de las funciones de agregación.' },
+        { sym: '""', insert: '""', back: 1, group: 'sintaxis', title: 'Cadena de texto',
+          desc: 'Escribe un literal de texto entre comillas dobles.' }
     ];
 
     function el(id) { return document.getElementById(id); }
@@ -124,6 +130,109 @@ const Editor = (() => {
         return AR_OPERATORS.find(op => (op.keywords || []).includes(w));
     }
 
+    /**
+     * Carga el diccionario de la base de datos seleccionada y construye dos
+     * índices: tabla -> atributos y atributo -> tablas. El segundo permite
+     * recomendar todas las tablas válidas cuando un atributo se comparte.
+     */
+    function setDictionary(dictionary) {
+        dictionaryTables = [];
+        attributeIndex = new Map();
+        tableIndex = new Map();
+
+        const tables = dictionary && Array.isArray(dictionary.tables) ? dictionary.tables : [];
+        tables.forEach(table => {
+            const name = table.name;
+            if (!name) return;
+            dictionaryTables.push(name);
+            const columns = Array.isArray(table.columns) ? table.columns : [];
+            const names = [];
+            columns.forEach(column => {
+                if (!column || !column.name) return;
+                names.push(column.name);
+                if (!attributeIndex.has(column.name)) attributeIndex.set(column.name, []);
+                if (!attributeIndex.get(column.name).includes(name)) {
+                    attributeIndex.get(column.name).push(name);
+                }
+            });
+            tableIndex.set(name, names);
+        });
+        updateAutocompleteHint();
+    }
+
+    function updateAutocompleteHint() {
+        const hint = el('autocompleteHint');
+        if (!hint) return;
+        if (!dictionaryTables.length) {
+            hint.innerHTML = '<i class="bi bi-lightning-charge"></i> Conecta tu MySQL para autocompletar con el diccionario.';
+            hint.classList.add('is-muted');
+            return;
+        }
+        const attributes = attributeIndex.size;
+        hint.innerHTML = '<i class="bi bi-lightning-charge-fill"></i> Autocompletado: ' +
+            dictionaryTables.length + ' tablas, ' + attributes +
+            ' atributos · <strong>Tab</strong> para aceptar';
+        hint.classList.remove('is-muted');
+    }
+
+    function attributeSuggestions(prefix, qualifier, range) {
+        const term = (prefix || '').toLowerCase();
+        const suggestions = [];
+        const tables = qualifier ? [qualifier] : dictionaryTables;
+        const seen = new Set();
+
+        tables.forEach(table => {
+            if (!tableIndex.has(table)) return;
+            tableIndex.get(table).forEach(attribute => {
+                if (term && !attribute.toLowerCase().startsWith(term)) return;
+                const key = table + '.' + attribute;
+                if (seen.has(key)) return;
+                seen.add(key);
+                suggestions.push({
+                    label: { label: attribute, description: table },
+                    kind: monaco.languages.CompletionItemKind.Field,
+                    detail: 'Tabla: ' + table,
+                    documentation: qualifier
+                        ? 'Atributo **' + attribute + '** de la tabla **' + table + '**.'
+                        : 'Atributo **' + attribute + '** de la tabla **' + table + '**. ' +
+                          'Se insertará cualificado para evitar ambigüedades.',
+                    insertText: qualifier ? attribute : table + '.' + attribute,
+                    filterText: attribute,
+                    sortText: '0_' + table + '_' + attribute,
+                    range: range
+                });
+            });
+        });
+        return suggestions;
+    }
+
+    function tableSuggestions(prefix, range) {
+        const term = (prefix || '').toLowerCase();
+        return dictionaryTables
+            .filter(table => !term || table.toLowerCase().startsWith(term))
+            .map(table => ({
+                label: table,
+                kind: monaco.languages.CompletionItemKind.Class,
+                detail: 'Tabla de la base de datos',
+                documentation: 'Relación **' + table + '** (' + (tableIndex.get(table) || []).length + ' atributos).',
+                insertText: table,
+                filterText: table,
+                sortText: '1_' + table,
+                range: range
+            }));
+    }
+
+    function operatorSuggestions(range) {
+        return AR_OPERATORS.map((op, i) => ({
+            label: op.sym,
+            kind: monaco.languages.CompletionItemKind.Operator,
+            documentation: op.title + ' — ' + op.desc,
+            insertText: op.insert.trim(),
+            sortText: '9_' + String(i).padStart(2, '0'),
+            range: range
+        }));
+    }
+
     function applyMonaco() {
         require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } });
 
@@ -138,7 +247,7 @@ const Editor = (() => {
                         [/(∏|⋉|⋊)/, 'operator.relational'],
                         [/(selec|seleccion|sigma|proy|proyeccion|pi|join|union|inter|intersec|interseccion|dif|diferencia|prodcart|producto|agrupar|agrup)\b/i, 'operator.relational'],
                         [/(sum|suma|prom|promedio|avg|max|min|count|contar)\b/i, 'aggregate'],
-                        [/(sin|cos|tan|asin|acos|atan|atan2|sqrt|raiz|log|ln|exp|abs|floor|ceil|round|mod|pow|radians|degrees)\b/i, 'function'],
+                        [/(sqrt|raiz|abs|floor|ceil|round|mod|pow|radians|degrees)\b/i, 'function'],
                         [/(and|or|not|true|false|null)\b/i, 'keyword'],
                         [/@[0-9]+/, 'variable'],
                         [/[a-zA-Z_]\w*\.\w+/, 'qualified'],
@@ -202,17 +311,32 @@ const Editor = (() => {
                 }
             });
 
-            /* Autocompletado de operadores. */
+            /* Autocompletado de operadores, tablas y atributos del diccionario. */
             monaco.languages.registerCompletionItemProvider('algebraRelacional', {
-                provideCompletionItems: function () {
-                    const suggestions = AR_OPERATORS.map((op, i) => ({
-                        label: op.sym,
-                        kind: monaco.languages.CompletionItemKind.Operator,
-                        documentation: op.title + ' — ' + op.desc,
-                        insertText: op.insert.trim(),
-                        sortText: '0' + i
-                    }));
-                    return { suggestions: suggestions };
+                triggerCharacters: ['.', ',', '(', ' ', ';'],
+                provideCompletionItems: function (model, position) {
+                    const word = model.getWordUntilPosition(position);
+                    const range = new monaco.Range(
+                        position.lineNumber,
+                        word.startColumn,
+                        position.lineNumber,
+                        word.endColumn
+                    );
+                    const linePrefix = model.getLineContent(position.lineNumber).substring(0, position.column - 1);
+                    const qualified = /([A-Za-z_]\w*)\.\w*$/.exec(linePrefix);
+                    const qualifier = qualified && tableIndex.has(qualified[1]) ? qualified[1] : null;
+
+                    let suggestions = [];
+                    if (qualifier) {
+                        suggestions = attributeSuggestions(word.word, qualifier, range);
+                    } else {
+                        suggestions = tableSuggestions(word.word, range)
+                            .concat(attributeSuggestions(word.word, null, range));
+                        if (!word.word) {
+                            suggestions = suggestions.concat(operatorSuggestions(range));
+                        }
+                    }
+                    return { suggestions: suggestions.slice(0, 400) };
                 }
             });
 
@@ -230,6 +354,16 @@ const Editor = (() => {
                 scrollBeyondLastLine: false,
                 roundedSelection: false,
                 renderLineHighlight: 'all',
+                tabCompletion: 'on',
+                suggestOnTriggerCharacters: true,
+                quickSuggestions: { other: true, comments: false, strings: true },
+                wordBasedSuggestions: 'off',
+                fixedOverflowWidgets: true,
+                suggest: {
+                    showWords: false,
+                    preview: true,
+                    insertMode: 'replace'
+                },
                 placeholder: 'Ejemplo: π(nombre, edad)(σ(edad >= 18)(Estudiantes))'
             });
             monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, function () {
@@ -250,11 +384,12 @@ const Editor = (() => {
     }
 
     function init() {
+        updateAutocompleteHint();
         if (typeof window.require !== 'undefined' && typeof monaco === 'undefined') {
             window.MonacoEnvironment = {
                 getWorkerUrl: function () {
                     const blob = new Blob([
-                        "importScripts('https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/base/worker/editor.worker.js');"
+                        "importScripts('https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/base/worker/workerMain.js');"
                     ], { type: 'text/javascript' });
                     return URL.createObjectURL(blob);
                 }
@@ -278,12 +413,17 @@ const Editor = (() => {
     function setValue(value) {
         if (monacoEditor) {
             monacoEditor.setValue(value);
+            const model = monacoEditor.getModel();
+            if (model) {
+                monacoEditor.setPosition(model.getPositionAt(value.length));
+            }
             monacoEditor.focus();
             return;
         }
         if (textarea) {
             textarea.value = value;
             textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = value.length;
         }
     }
 
@@ -315,5 +455,55 @@ const Editor = (() => {
         else if (textarea) textarea.focus();
     }
 
-    return { init, getValue, setValue, insert, focus, DELIMITERS };
+    /**
+     * Marca en el editor el carácter exacto donde el analizador detectó el
+     * error. En Monaco se dibuja un subrayado rojo (marker) y se coloca el
+     * cursor en esa posición; con el textarea de respaldo se selecciona.
+     */
+    function showError(offset, length, message) {
+        const value = getValue();
+        const rawOffset = Number.isInteger(offset) ? offset : 0;
+        const caretOffset = Math.max(0, Math.min(rawOffset, value.length));
+        let start = caretOffset;
+        let end = Math.min(value.length, start + Math.max(1, length || 1));
+        if (value.length > 0 && start >= value.length) {
+            start = value.length - 1;
+            end = value.length;
+        }
+
+        if (monacoEditor && typeof monaco !== 'undefined') {
+            const model = monacoEditor.getModel();
+            const startPos = model.getPositionAt(start);
+            const endPos = model.getPositionAt(end);
+            monaco.editor.setModelMarkers(model, 'ar-analyzer', [{
+                severity: monaco.MarkerSeverity.Error,
+                message: message || 'Error de análisis',
+                startLineNumber: startPos.lineNumber,
+                startColumn: startPos.column,
+                endLineNumber: endPos.lineNumber,
+                endColumn: endPos.column
+            }]);
+            const caret = model.getPositionAt(caretOffset);
+            monacoEditor.setPosition(caret);
+            monacoEditor.revealPositionInCenter(caret, monaco.editor.ScrollType.Smooth);
+            monacoEditor.focus();
+            return;
+        }
+
+        if (textarea) {
+            textarea.focus();
+            textarea.setSelectionRange(start, end);
+        }
+    }
+
+    function clearMarkers() {
+        if (monacoEditor && typeof monaco !== 'undefined') {
+            monaco.editor.setModelMarkers(monacoEditor.getModel(), 'ar-analyzer', []);
+        }
+    }
+
+    return {
+        init, getValue, setValue, insert, focus,
+        showError, clearMarkers, setDictionary, DELIMITERS
+    };
 })();

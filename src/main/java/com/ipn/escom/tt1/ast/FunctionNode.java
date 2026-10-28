@@ -1,11 +1,12 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Invocación de una función trigonométrica o matemática
- * (SIN, COS, TAN, SQRT, LOG, ...).
+ * Invocación de una función matemática (SQRT, ABS, FLOOR, ...).
  */
 public class FunctionNode extends ScalarExpression {
 
@@ -32,5 +33,16 @@ public class FunctionNode extends ScalarExpression {
             sb.append(a.toTreeString(level + 1));
         }
         return sb.toString();
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        List<Map<String, Object>> children = new ArrayList<>();
+        int index = 1;
+        for (ScalarExpression argument : arguments) {
+            children.add(TreeNode.child(argument.toTree(), arguments.size() == 1 ? "argumento" : "arg " + index));
+            index++;
+        }
+        return TreeNode.of(name + "()", "Función", "function", children);
     }
 }

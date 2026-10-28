@@ -3,226 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TT1 - Álgebra Relacional a SQL</title>
+    <title>TT1 · Álgebra Relacional a SQL</title>
+    <meta name="description" content="Sistema de apoyo para la enseñanza del álgebra relacional: análisis léxico, árbol sintáctico con Graphviz y traducción a SQL.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Roboto+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Roboto+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Viz.js debe cargarse antes que Monaco: el loader de Monaco define AMD y
+         Viz.js, al detectarlo, dejaría de exponerse como variable global. -->
+    <script src="/js/vendor/viz-global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
     <link rel="stylesheet" href="/css/app.v4.css">
 </head>
-<body class="bg-slate-100 min-h-screen pb-20">
+<body>
 
-    <header class="bg-slate-800 text-white py-6 shadow-md relative">
-        <div class="container mx-auto max-w-7xl px-6 text-center">
-            <h1 class="text-2xl font-bold tracking-tight">Sistema de Apoyo para la Ense&ntilde;anza del &Aacute;lgebra Relacional</h1>
-            <p class="text-sm text-slate-300 mt-1">IPN &middot; ESCOM &middot; Trabajo Terminal 2027-A159</p>
+    <header class="app-header">
+        <div class="header-inner">
+            <a class="brand" href="/" aria-label="Ir al inicio">
+                <span class="brand-mark" aria-hidden="true">Σ</span>
+                <span class="brand-copy">
+                    <strong>Álgebra Relacional</strong>
+                    <small>IPN · ESCOM · TT 2027-A159</small>
+                </span>
+            </a>
+            <nav class="top-nav" aria-label="Navegación principal">
+                <a href="/" class="active" aria-current="page"><i class="bi bi-pencil-square" aria-hidden="true"></i> Herramienta</a>
+                <a href="/presentacion.html"><i class="bi bi-info-circle" aria-hidden="true"></i> Acerca de</a>
+                <a href="/instalacion.html"><i class="bi bi-terminal" aria-hidden="true"></i> Instalación</a>
+                <a href="/terminos.html"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> Términos</a>
+                <a href="/api/manual" download class="nav-manual"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Manual</a>
+            </nav>
         </div>
-        <a href="/presentacion.html" class="absolute top-1/2 -translate-y-1/2 right-6 text-sm text-slate-300 hover:text-white border border-slate-600 hover:border-slate-400 px-3 py-1.5 rounded-sm transition flex items-center gap-1">
-            <i class="bi bi-info-circle"></i> Acerca de
-        </a>
     </header>
 
-    <main class="container mx-auto p-6 max-w-7xl">
+    <main class="app-main">
 
-        <!-- ================= Conexion a MySQL ================= -->
-        <section class="bg-white rounded shadow-sm border border-slate-200 p-5 mb-6">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
-                    <i class="bi bi-server text-blue-800"></i> Conexión a MySQL local
-                </h2>
-                <span id="connectionBadge" class="hidden text-xs font-semibold px-2 py-1 rounded-sm bg-emerald-50 text-emerald-800 border border-emerald-200">
-                    <i class="bi bi-check-circle"></i> Conectado
+        <!-- ================= Conexión ================= -->
+        <section class="card connection-card" aria-labelledby="connectionTitle">
+            <div class="card-head">
+                <div>
+                    <h2 id="connectionTitle" class="card-title"><i class="bi bi-server" aria-hidden="true"></i> Conexión a MySQL local</h2>
+                    <p class="card-subtitle">Las credenciales se usan únicamente durante la sesión y no se guardan en el servidor.</p>
+                </div>
+                <span id="connectionBadge" class="status-badge hidden">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Conectado
                 </span>
             </div>
 
-            <div id="connectionForm" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-                <div class="md:col-span-3">
-                    <label for="connHost" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Host</label>
-                    <input id="connHost" value="localhost" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+            <div id="connectionForm" class="connection-grid">
+                <div class="field">
+                    <label for="connHost">Host</label>
+                    <input id="connHost" value="localhost" autocomplete="off">
                 </div>
-                <div class="md:col-span-2">
-                    <label for="connPort" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Puerto</label>
-                    <input id="connPort" value="3306" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                <div class="field">
+                    <label for="connPort">Puerto</label>
+                    <input id="connPort" value="3306" inputmode="numeric" autocomplete="off">
                 </div>
-                <div class="md:col-span-3">
-                    <label for="connUser" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Usuario</label>
-                    <input id="connUser" value="root" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                <div class="field">
+                    <label for="connUser">Usuario</label>
+                    <input id="connUser" value="root" autocomplete="username">
                 </div>
-                <div class="md:col-span-2">
-                    <label for="connPassword" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Contraseña</label>
-                    <input id="connPassword" type="password" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                <div class="field">
+                    <label for="connPassword">Contraseña</label>
+                    <input id="connPassword" type="password" autocomplete="current-password">
                 </div>
-                <div class="md:col-span-2">
-                    <button id="connectBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-sm font-medium py-2 px-4 rounded-sm border border-blue-900 transition">
-                        <i class="bi bi-plug"></i> Conectar
+                <div class="field field-action">
+                    <button id="connectBtn" class="btn btn-primary btn-block">
+                        <i class="bi bi-plug" aria-hidden="true"></i> Conectar
                     </button>
                 </div>
-                <div class="md:col-span-12">
-                    <p id="connectionMessage" class="text-xs text-slate-500">Ingresa tus claves locales de MySQL para cargar tus bases de datos.</p>
-                </div>
+                <p id="connectionMessage" class="connection-message">Ingresa tus claves locales de MySQL para cargar tus bases de datos.</p>
             </div>
 
-            <div id="connectionInfo" class="hidden">
-                <div class="flex flex-wrap items-end gap-3">
-                    <div class="flex-1 min-w-[220px]">
-                        <p class="text-xs text-slate-500 mb-1" id="connSummary"></p>
-                        <label for="databaseSelect" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                            <i class="bi bi-database"></i> Base de datos
-                        </label>
-                        <select id="databaseSelect" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700"></select>
+            <div id="connectionInfo" class="connection-connected hidden">
+                <div class="connection-connected-main">
+                    <p id="connSummary" class="connection-summary"></p>
+                    <div class="field">
+                        <label for="databaseSelect"><i class="bi bi-database" aria-hidden="true"></i> Base de datos</label>
+                        <select id="databaseSelect"></select>
                     </div>
-                    <button id="openDictionaryBtn" class="text-sm font-medium text-blue-900 hover:text-white hover:bg-blue-900 border border-blue-900 px-3 py-2 rounded-sm transition flex items-center gap-1">
-                        <i class="bi bi-journal-text"></i> Ver diccionario de datos
+                </div>
+                <div class="connection-actions">
+                    <button id="openDictionaryBtn" class="btn btn-outline">
+                        <i class="bi bi-journal-text" aria-hidden="true"></i> Diccionario
                     </button>
-                    <button id="disconnectBtn" class="text-sm font-medium text-slate-600 hover:text-white hover:bg-slate-600 border border-slate-400 px-3 py-2 rounded-sm transition flex items-center gap-1">
-                        <i class="bi bi-box-arrow-right"></i> Desconectar
+                    <button id="disconnectBtn" class="btn btn-ghost">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Desconectar
                     </button>
                 </div>
             </div>
         </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- ================= Editor ================= -->
-            <div class="bg-white rounded shadow-sm border border-slate-200 p-6">
-                <h2 class="text-base font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                    <i class="bi bi-input-cursor-text text-blue-800"></i>
-                    Expresi&oacute;n de &Aacute;lgebra Relacional
-                </h2>
+        <!-- ================= Área de trabajo ================= -->
+        <div class="workspace-grid">
+
+            <!-- Editor -->
+            <section class="card editor-card" aria-labelledby="editorTitle">
+                <div class="card-head compact">
+                    <div>
+                        <h2 id="editorTitle" class="card-title"><i class="bi bi-input-cursor-text" aria-hidden="true"></i> Expresión de Álgebra Relacional</h2>
+                        <p class="card-subtitle">Ctrl + Enter para traducir. Usa Tab para aceptar las sugerencias del diccionario.</p>
+                    </div>
+                </div>
+
+                <div id="autocompleteHint" class="autocomplete-hint is-muted" role="status" aria-live="polite"></div>
 
                 <div id="editorContainer" class="editor-container"></div>
 
-                <div class="flex flex-wrap justify-end gap-2 mt-3">
-                    <button id="translateBtn" class="bg-blue-900 hover:bg-blue-800 text-white text-sm font-medium py-2 px-4 rounded-sm border border-blue-900 transition">
-                        <i class="bi bi-play-fill"></i> Traducir y ejecutar
+                <div class="action-row">
+                    <button id="translateBtn" class="btn btn-primary">
+                        <i class="bi bi-play-fill" aria-hidden="true"></i> Traducir y ejecutar
                     </button>
-                    <button id="saveBtn" class="bg-emerald-800 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-sm border border-emerald-800 transition">
-                        <i class="bi bi-save"></i> Guardar @n
-                    </button>
-                    <button id="clearHistoryBtn" class="bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium py-2 px-3 rounded-sm border border-slate-600 transition">
-                        <i class="bi bi-eraser"></i> Limpiar historial
+                    <button id="openTreeBtn" class="btn btn-outline" disabled aria-disabled="true">
+                        <i class="bi bi-diagram-3" aria-hidden="true"></i> Ver árbol sintáctico
                     </button>
                 </div>
 
-                <div class="mt-5">
-                    <p class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
-                        Operadores (haz clic para insertar)
-                    </p>
-                    <div id="operatorsPanel" class="operators-panel"></div>
+                <div class="operators-block">
+                    <div class="section-label">
+                        <span>Operadores</span>
+                        <small>Haz clic para insertar</small>
+                    </div>
+                    <div id="operatorsPanel" class="operators-panel" role="toolbar" aria-label="Operadores de álgebra relacional"></div>
                 </div>
 
-                <div class="mt-5">
-                    <label for="exampleSelect" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Ejemplos generados desde tu base de datos</label>
-                    <select id="exampleSelect" class="w-full mt-1 border border-slate-300 rounded-sm p-2 text-sm bg-white text-slate-700">
+                <div class="examples-block">
+                    <label for="exampleSelect" class="section-label"><span>Ejemplos desde tu base de datos</span></label>
+                    <select id="exampleSelect">
                         <option value="">-- Selecciona un ejemplo --</option>
                     </select>
                 </div>
+            </section>
 
-                <div class="mt-5 p-3 border border-blue-200 bg-blue-50 rounded-sm">
-                    <p class="text-xs font-semibold text-blue-900 uppercase tracking-wider mb-1">Sentencia SQL completa</p>
-                    <pre id="expandedOutput" class="text-sm text-blue-950 whitespace-pre-wrap break-words">--</pre>
+            <!-- Proceso -->
+            <section class="card process-card" aria-labelledby="processTitle">
+                <div class="card-head compact">
+                    <div>
+                        <h2 id="processTitle" class="card-title">Proceso de traducción</h2>
+                        <p id="treeAvailableHint" class="card-subtitle">Traduce una expresión para habilitar el diagrama.</p>
+                    </div>
                 </div>
 
-                <div class="mt-3 text-xs text-slate-600">
-                    <span class="font-semibold uppercase tracking-wider">Historial activo:</span>
-                    <span id="historyKeys" class="text-blue-900 ml-1">vacío</span>
-                </div>
-            </div>
+                <div id="errorBox" class="error-box hidden" role="alert"></div>
 
-            <!-- ================= Resultados ================= -->
-            <div class="bg-white rounded shadow-sm border border-slate-200 p-6">
-                <h2 class="text-base font-semibold text-slate-700 mb-3">Proceso de traducci&oacute;n</h2>
-
-                <div id="errorBox" class="hidden mb-4 p-3 border border-red-300 bg-red-50 rounded-sm text-sm text-red-800"></div>
-
-                <div class="mb-4">
-                    <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
-                        <i class="bi bi-signpost-split"></i> Tokenizaci&oacute;n
-                    </h3>
+                <div class="process-block">
+                    <div class="section-label">
+                        <span><i class="bi bi-signpost-split" aria-hidden="true"></i> Tokenización</span>
+                    </div>
                     <div id="tokensContainer" class="tokens-container">
-                        <span class="text-slate-400 text-sm">Esperando expresi&oacute;n...</span>
+                        <span class="text-slate-400 text-sm">Esperando expresión...</span>
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Equivalencia AR &rarr; SQL</h3>
-                    <div class="equivalence-box">
-                        <div class="border border-slate-300 rounded-sm p-3 bg-slate-50">
-                            <p class="text-xs font-semibold text-slate-500 uppercase mb-1">&Aacute;lgebra Relacional</p>
-                            <pre id="arEquivOutput" class="text-xs whitespace-pre-wrap break-words text-slate-800">--</pre>
-                        </div>
-                        <div class="equivalence-arrow"><i class="bi bi-arrow-right"></i></div>
-                        <div class="border border-blue-300 rounded-sm p-3 bg-blue-50">
-                            <p class="text-xs font-semibold text-blue-800 uppercase mb-1">SQL generado</p>
-                            <pre id="sqlEquivOutput" class="text-xs whitespace-pre-wrap break-words text-blue-950">--</pre>
-                        </div>
+                <div class="process-block">
+                    <div class="section-label">
+                        <span>Equivalencia AR → SQL</span>
+                        <button id="copySqlBtn" class="mini-btn" type="button" disabled>
+                            <i class="bi bi-clipboard" aria-hidden="true"></i> Copiar SQL
+                        </button>
+                    </div>
+                    <div class="sql-panel">
+                        <pre id="sqlEquivOutput">--</pre>
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">&Aacute;rbol sint&aacute;ctico</h3>
-                    <pre id="treeOutput" class="tree-view bg-slate-50 border border-slate-200 rounded-sm p-3 text-sm overflow-x-auto text-slate-800 max-h-56">Esperando consulta...</pre>
-                </div>
-
-                <div>
-                    <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                        Tabla de resultados <span id="execInfo" class="text-slate-400 normal-case font-normal"></span>
-                    </h3>
-                    <div id="resultTableContainer" class="bg-slate-50 border border-slate-200 rounded-sm p-3 text-sm overflow-x-auto text-slate-500 max-h-80">
-                        Esperando ejecuci&oacute;n...
+                <div class="process-block results-block">
+                    <div class="section-label">
+                        <span>Tabla de resultados <span id="execInfo" class="exec-info"></span></span>
+                    </div>
+                    <div id="resultTableContainer" class="result-table-container">
+                        Esperando ejecución...
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     </main>
 
-    <div id="tipBanner" class="fixed bottom-0 left-0 right-0 bg-slate-800 text-slate-100 text-sm py-3 px-4 shadow-lg z-40 hidden">
-        <div class="container mx-auto max-w-7xl flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <i class="bi bi-info-circle text-blue-300 text-base"></i>
-                <span><strong>Tip:</strong> abre el diccionario de datos y haz clic en una tabla para ver su contenido real.</span>
+    <footer class="app-footer">
+        <div class="footer-inner">
+            <p><strong>TT 2027-A159</strong> · Instituto Politécnico Nacional · ESCOM</p>
+            <nav aria-label="Enlaces del pie de página">
+                <a href="/presentacion.html">Acerca de</a>
+                <a href="/instalacion.html">Guía de instalación</a>
+                <a href="/terminos.html">Términos y condiciones</a>
+                <a href="/api/manual" download>Manual de usuario</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- ================= Diagrama del árbol (Graphviz) ================= -->
+    <div id="treeModal" class="tree-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="treeModalTitle" aria-hidden="true">
+        <div class="tree-modal-dialog">
+            <header class="tree-modal-header">
+                <div class="tree-modal-title">
+                    <i class="bi bi-diagram-3" aria-hidden="true"></i>
+                    <div>
+                        <h3 id="treeModalTitle">Árbol sintáctico</h3>
+                        <p>Generado con Graphviz · disposición vertical</p>
+                    </div>
+                </div>
+                <div class="tree-toolbar" role="group" aria-label="Controles del diagrama">
+                    <button id="treeModalZoomOutBtn" type="button" class="tree-tool" title="Alejar" aria-label="Alejar diagrama">
+                        <i class="bi bi-zoom-out" aria-hidden="true"></i>
+                    </button>
+                    <button id="treeModalFitBtn" type="button" class="tree-tool" title="Ajustar a la ventana" aria-label="Ajustar diagrama a la ventana">
+                        <i class="bi bi-aspect-ratio" aria-hidden="true"></i>
+                    </button>
+                    <button id="treeModalZoomInBtn" type="button" class="tree-tool" title="Acercar" aria-label="Acercar diagrama">
+                        <i class="bi bi-zoom-in" aria-hidden="true"></i>
+                    </button>
+                    <button id="treeModalDownloadBtn" type="button" class="tree-tool tree-tool-text" title="Descargar diagrama en JPG" aria-label="Descargar diagrama en JPG">
+                        <i class="bi bi-download" aria-hidden="true"></i> JPG
+                    </button>
+                    <button id="closeTreeModalBtn" type="button" class="tree-tool tree-tool-close" title="Cerrar" aria-label="Cerrar diagrama">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </header>
+            <div id="treeModalCanvas" class="tree-modal-canvas" role="region" aria-label="Diagrama del árbol sintáctico">
+                <p class="tree-empty">El diagrama se mostrará aquí después de traducir una expresión.</p>
             </div>
-            <button id="closeTipBtn" class="text-slate-300 hover:text-white transition shrink-0"><i class="bi bi-x-lg"></i></button>
+            <footer class="tree-modal-footer">
+                <div id="treeModalLegend" class="tree-legend hidden"></div>
+                <span id="treeModalStatus" class="tree-modal-status" role="status" aria-live="polite"></span>
+            </footer>
         </div>
     </div>
 
     <!-- ================= Diccionario de datos ================= -->
     <div id="dictionaryOverlay" class="offcanvas-overlay fixed inset-0 bg-black/40 z-50"></div>
-    <aside id="dictionaryPanel" class="offcanvas fixed top-0 right-0 h-full w-full max-w-4xl bg-white shadow-2xl z-50 flex flex-col">
-        <div class="bg-slate-800 text-white px-5 py-4 flex items-center justify-between">
+    <aside id="dictionaryPanel" class="offcanvas fixed top-0 right-0 h-full w-full max-w-4xl bg-white shadow-2xl z-50 flex flex-col" aria-label="Diccionario de datos" aria-hidden="true">
+        <div class="offcanvas-header">
             <div class="flex items-center gap-2">
-                <i class="bi bi-journal-text text-blue-300"></i>
-                <h3 class="text-base font-semibold">Diccionario de datos: <span id="dictionaryTitle">--</span></h3>
+                <i class="bi bi-journal-text" aria-hidden="true"></i>
+                <h3>Diccionario de datos: <span id="dictionaryTitle">--</span></h3>
             </div>
-            <button id="closeDictionaryBtn" class="text-slate-300 hover:text-white transition"><i class="bi bi-x-lg"></i></button>
+            <button id="closeDictionaryBtn" class="icon-btn" aria-label="Cerrar diccionario"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
         </div>
-        <div class="px-5 py-3 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
-            <i class="bi bi-search text-slate-400"></i>
-            <input id="dictionarySearch" placeholder="Buscar tabla o atributo..." class="w-full bg-transparent text-sm outline-none text-slate-700">
-            <span id="dictionaryCount" class="text-xs text-slate-400 shrink-0"></span>
+        <div class="offcanvas-search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input id="dictionarySearch" placeholder="Buscar tabla o atributo..." aria-label="Buscar tabla o atributo">
+            <span id="dictionaryCount"></span>
         </div>
-        <div id="dictionaryBody" class="p-5 flex-1 overflow-auto bg-white">
+        <div id="dictionaryBody" class="offcanvas-body">
             <p class="text-slate-400 text-sm">Cargando diccionario...</p>
         </div>
-        <div class="bg-slate-100 px-5 py-2 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
-            <span><i class="bi bi-info-circle"></i> Haz clic en el nombre de una tabla para ver su contenido.</span>
-            <span>Primera versi&oacute;n (sin diagramas E-R)</span>
+        <div class="offcanvas-footer">
+            <span><i class="bi bi-info-circle" aria-hidden="true"></i> Haz clic en el nombre de una tabla para ver su contenido.</span>
+            <span>Primera versión (sin diagramas E-R)</span>
         </div>
     </aside>
 
     <!-- ================= Vista previa de tabla ================= -->
-    <div id="tableModal" class="modal-overlay">
-        <div class="modal-content" style="width: 900px;">
-            <div class="bg-slate-800 text-white px-5 py-3 flex items-center justify-between">
+    <div id="tableModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="tableModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
                 <div class="flex items-center gap-2">
-                    <i class="bi bi-table text-blue-300"></i>
-                    <h3 class="text-base font-semibold">
-                        <span id="modalSchema">--</span>.<span id="modalTable">--</span>
-                    </h3>
+                    <i class="bi bi-table" aria-hidden="true"></i>
+                    <h3 id="tableModalTitle"><span id="modalSchema">--</span>.<span id="modalTable">--</span></h3>
                 </div>
-                <button id="closeModalBtn" class="text-slate-300 hover:text-white transition"><i class="bi bi-x-lg"></i></button>
+                <button id="closeModalBtn" class="icon-btn" aria-label="Cerrar vista previa"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
             </div>
-            <div id="modalBody" class="p-4 overflow-auto flex-1 bg-white">Cargando...</div>
-            <div class="bg-slate-100 px-4 py-2 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
+            <div id="modalBody" class="modal-body">Cargando...</div>
+            <div class="modal-footer">
                 <span id="modalInfo"></span>
                 <span>Vista previa limitada a 50 filas</span>
             </div>
@@ -231,6 +274,7 @@
 
     <script src="/js/api.v4.js"></script>
     <script src="/js/editor.v4.js"></script>
+    <script src="/js/tree.v4.js"></script>
     <script src="/js/modal.v4.js"></script>
     <script src="/js/connection.v4.js"></script>
     <script src="/js/translate.v4.js"></script>

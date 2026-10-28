@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="844" viewBox="0 0 1040 844">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.16"/></filter><linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2563eb"/><stop offset="0.5" stop-color="#0d9488"/><stop offset="1" stop-color="#7e22ce"/></linearGradient></defs>
+<rect width="1040" height="844" fill="#ffffff"/>
+<rect x="0" y="0" width="1040" height="7" fill="url(#accent)"/>
+<text x="56" y="74" font-family="DejaVu Sans" font-weight="bold" font-size="12" letter-spacing="1.6" fill="#64748b">ÁLGEBRA RELACIONAL · TT1 · ÁRBOL DE SINTAXIS</text>
+<text x="56" y="119" font-family="DejaVu Sans" font-weight="bold" font-size="29" fill="#0f172a">Función con varios argumentos</text>
+<rect x="56" y="135" width="928" height="57" rx="12" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="56" y="135" width="4" height="57" rx="2" fill="#2563eb"/>
+<text x="78" y="162" font-family="DejaVu Sans" font-size="15" fill="#0f172a">π(MOD(salario, 1000))(Empleados)</text>
+<text x="56" y="222" font-family="DejaVu Sans" font-size="13" fill="#475569">La lista de argumentos se representa como una cadena de nodos con etiquetas arg n.</text>
+<text x="56" y="248" font-family="DejaVu Sans" font-size="11" fill="#94a3b8">Producción: expr ::= FUNCTION LPAREN argList RPAREN</text>
+<path d="M 546.9 352.0 C 546.9 381.0, 419.7 381.0, 419.7 410.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="451.6" y="376.0" width="63.4" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="483.3" y="388.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">atributos</text>
+<path d="M 419.7 466.0 C 419.7 495.0, 419.7 495.0, 419.7 524.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<path d="M 419.7 580.0 C 419.7 609.0, 342.7 609.0, 342.7 638.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="359.9" y="604.0" width="42.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="381.2" y="616.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">arg 1</text>
+<path d="M 419.7 580.0 C 419.7 609.0, 496.8 609.0, 496.8 638.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="437.0" y="604.0" width="42.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="458.2" y="616.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">arg 2</text>
+<path d="M 546.9 352.0 C 546.9 381.0, 674.1 381.0, 674.1 410.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="585.7" y="376.0" width="49.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="610.5" y="388.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">fuente</text>
+<g><rect x="490.9" y="296.0" width="112.0" height="56" rx="11" fill="#0d9488" stroke="#0d9488" filter="url(#shadow)"/>
+<text x="546.9" y="320.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">π</text>
+<text x="546.9" y="338.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Proyección</text>
+</g>
+<g><rect x="361.8" y="410.0" width="115.9" height="56" rx="11" fill="#64748b" stroke="#64748b" filter="url(#shadow)"/>
+<text x="419.7" y="434.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">lista</text>
+<text x="419.7" y="452.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">1 elemento(s)</text>
+</g>
+<g><rect x="361.8" y="524.0" width="115.8" height="56" rx="11" fill="#047857" stroke="#047857" filter="url(#shadow)"/>
+<text x="419.7" y="548.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">MOD()</text>
+<text x="419.7" y="566.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Función</text>
+</g>
+<g><rect x="282.5" y="638.0" width="120.2" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="342.7" y="662.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">salario</text>
+<text x="342.7" y="680.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="440.8" y="638.0" width="112.0" height="56" rx="11" fill="#15803d" stroke="#15803d" filter="url(#shadow)"/>
+<text x="496.8" y="662.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">1000</text>
+<text x="496.8" y="680.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Número</text>
+</g>
+<g><rect x="590.8" y="410.0" width="166.7" height="56" rx="11" fill="#334155" stroke="#334155" filter="url(#shadow)"/>
+<text x="674.1" y="434.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Empleados</text>
+<text x="674.1" y="452.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Tabla</text>
+</g>
+<line x1="56" y1="800" x2="984" y2="800" stroke="#e2e8f0" stroke-width="1"/>
+<text x="56" y="820" font-family="DejaVu Sans" font-size="11" fill="#94a3b8">Generado por el analizador sintáctico del proyecto · Sistema de Apoyo para la Enseñanza del Álgebra Relacional</text>
+<text x="984" y="820" text-anchor="end" font-family="DejaVu Sans Mono" font-size="11" fill="#94a3b8">25-funcion-varios-argumentos</text>
+</svg>

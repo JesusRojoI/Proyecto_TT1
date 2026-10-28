@@ -1,5 +1,8 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Operación aritmética binaria: suma, resta, multiplicación, división o
  * potencia.
@@ -37,5 +40,12 @@ public class ArithNode extends ScalarExpression {
         return "  ".repeat(level) + name() + " (" + operator + ")\n" +
                left.toTreeString(level + 1) +
                right.toTreeString(level + 1);
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.of(operator, name(), "arith", List.of(
+                TreeNode.child(left.toTree(), "izquierda"),
+                TreeNode.child(right.toTree(), "derecha")));
     }
 }

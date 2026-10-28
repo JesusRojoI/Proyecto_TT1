@@ -1,5 +1,8 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Conjunción o disyunción lógica de dos condiciones ({@code AND} / {@code OR}).
  */
@@ -26,5 +29,13 @@ public class LogicalNode extends ScalarExpression {
         return "  ".repeat(level) + label + "\n" +
                left.toTreeString(level + 1) +
                right.toTreeString(level + 1);
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        boolean and = "AND".equals(operator);
+        return TreeNode.of(and ? "∧" : "∨", and ? "Conjunción" : "Disyunción", "logic", List.of(
+                TreeNode.child(left.toTree(), "izquierda"),
+                TreeNode.child(right.toTree(), "derecha")));
     }
 }

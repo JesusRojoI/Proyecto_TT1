@@ -7,8 +7,8 @@ import java.util.*;
 /* =============================================================
    Gramática del Álgebra Relacional (TT1)
    Basada en la propuesta de GramAlgRel.cup del profesor, ampliada con
-   funciones trigonométricas/matemáticas, comparadores de signo, literales
-   de cadena, comentarios y los símbolos unicode de los operadores.
+   funciones matemáticas, comparadores de signo, literales de cadena,
+   comentarios y los símbolos unicode de los operadores.
    ============================================================= */
 
 parser code {:

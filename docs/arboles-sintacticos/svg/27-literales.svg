@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1494" height="1093" viewBox="0 0 1494 1093">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.16"/></filter><linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2563eb"/><stop offset="0.5" stop-color="#0d9488"/><stop offset="1" stop-color="#7e22ce"/></linearGradient></defs>
+<rect width="1494" height="1093" fill="#ffffff"/>
+<rect x="0" y="0" width="1494" height="7" fill="url(#accent)"/>
+<text x="56" y="74" font-family="DejaVu Sans" font-weight="bold" font-size="12" letter-spacing="1.6" fill="#64748b">ÁLGEBRA RELACIONAL · TT1 · ÁRBOL DE SINTAXIS</text>
+<text x="56" y="119" font-family="DejaVu Sans" font-weight="bold" font-size="29" fill="#0f172a">Literales (número, cadena, lógico, nulo)</text>
+<rect x="56" y="135" width="1382.328125" height="78" rx="12" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="56" y="135" width="4" height="78" rx="2" fill="#2563eb"/>
+<text x="78" y="162" font-family="DejaVu Sans" font-size="15" fill="#0f172a">σ(edad &gt; 5 &amp;&amp; activo == TRUE &amp;&amp; nombre != NULL &amp;&amp; ciudad ==</text>
+<text x="78" y="183" font-family="DejaVu Sans" font-size="15" fill="#0f172a">&quot;CDMX&quot;)(Estudiantes)</text>
+<text x="56" y="243" font-family="DejaVu Sans" font-size="13" fill="#475569">Los literales son hojas del árbol y conservan su tipo.</text>
+<text x="56" y="269" font-family="DejaVu Sans" font-size="11" fill="#94a3b8">Producción: expr ::= NUMBER | STRING | TRUE | FALSE | NULL</text>
+<path d="M 1095.7 373.0 C 1095.7 402.0, 825.7 402.0, 825.7 431.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="927.4" y="397.0" width="66.6" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="960.7" y="409.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">condición</text>
+<path d="M 825.7 487.0 C 825.7 516.0, 553.3 516.0, 553.3 545.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="657.2" y="511.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="689.5" y="523.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 553.3 601.0 C 553.3 630.0, 321.2 630.0, 321.2 659.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="404.9" y="625.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="437.3" y="637.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 321.2 715.0 C 321.2 744.0, 171.0 744.0, 171.0 773.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="213.8" y="739.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="246.1" y="751.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 171.0 829.0 C 171.0 858.0, 96.0 858.0, 96.0 887.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="101.2" y="853.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="133.5" y="865.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 171.0 829.0 C 171.0 858.0, 246.0 858.0, 246.0 887.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="179.2" y="853.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="208.5" y="865.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 321.2 715.0 C 321.2 744.0, 471.4 744.0, 471.4 773.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="367.0" y="739.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="396.3" y="751.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 471.4 829.0 C 471.4 858.0, 396.3 858.0, 396.3 887.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="401.5" y="853.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="433.8" y="865.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 471.4 829.0 C 471.4 858.0, 546.5 858.0, 546.5 887.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="479.7" y="853.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="509.0" y="865.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 553.3 601.0 C 553.3 630.0, 785.5 630.0, 785.5 659.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="640.1" y="625.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="669.4" y="637.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 785.5 715.0 C 785.5 744.0, 705.8 744.0, 705.8 773.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="713.3" y="739.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="745.6" y="751.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 785.5 715.0 C 785.5 744.0, 865.1 744.0, 865.1 773.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="796.0" y="739.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="825.3" y="751.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 825.7 487.0 C 825.7 516.0, 1098.1 516.0, 1098.1 545.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="932.6" y="511.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="961.9" y="523.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 1098.1 601.0 C 1098.1 630.0, 1018.6 630.0, 1018.6 659.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="1026.0" y="625.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1058.4" y="637.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 1098.1 601.0 C 1098.1 630.0, 1177.6 630.0, 1177.6 659.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="1108.6" y="625.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1137.9" y="637.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 1095.7 373.0 C 1095.7 402.0, 1365.7 402.0, 1365.7 431.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="1205.9" y="397.0" width="49.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1230.7" y="409.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">fuente</text>
+<g><rect x="1039.7" y="317.0" width="112.0" height="56" rx="11" fill="#2563eb" stroke="#2563eb" filter="url(#shadow)"/>
+<text x="1095.7" y="341.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">σ</text>
+<text x="1095.7" y="359.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Selección</text>
+</g>
+<g><rect x="769.7" y="431.0" width="112.0" height="56" rx="11" fill="#9f1239" stroke="#9f1239" filter="url(#shadow)"/>
+<text x="825.7" y="455.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">∧</text>
+<text x="825.7" y="473.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Conjunción</text>
+</g>
+<g><rect x="497.3" y="545.0" width="112.0" height="56" rx="11" fill="#9f1239" stroke="#9f1239" filter="url(#shadow)"/>
+<text x="553.3" y="569.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">∧</text>
+<text x="553.3" y="587.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Conjunción</text>
+</g>
+<g><rect x="265.2" y="659.0" width="112.0" height="56" rx="11" fill="#9f1239" stroke="#9f1239" filter="url(#shadow)"/>
+<text x="321.2" y="683.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">∧</text>
+<text x="321.2" y="701.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Conjunción</text>
+</g>
+<g><rect x="115.0" y="773.0" width="112.0" height="56" rx="11" fill="#be123c" stroke="#be123c" filter="url(#shadow)"/>
+<text x="171.0" y="797.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">&gt;</text>
+<text x="171.0" y="815.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Mayor que</text>
+</g>
+<g><rect x="40.0" y="887.0" width="112.0" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="96.0" y="911.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">edad</text>
+<text x="96.0" y="929.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="190.0" y="887.0" width="112.0" height="56" rx="11" fill="#15803d" stroke="#15803d" filter="url(#shadow)"/>
+<text x="246.0" y="911.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">5</text>
+<text x="246.0" y="929.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Número</text>
+</g>
+<g><rect x="415.4" y="773.0" width="112.0" height="56" rx="11" fill="#be123c" stroke="#be123c" filter="url(#shadow)"/>
+<text x="471.4" y="797.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">==</text>
+<text x="471.4" y="815.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Igual a</text>
+</g>
+<g><rect x="340.0" y="887.0" width="112.5" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="396.3" y="911.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">activo</text>
+<text x="396.3" y="929.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="490.5" y="887.0" width="112.0" height="56" rx="11" fill="#15803d" stroke="#15803d" filter="url(#shadow)"/>
+<text x="546.5" y="911.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">TRUE</text>
+<text x="546.5" y="929.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Lógico</text>
+</g>
+<g><rect x="729.5" y="659.0" width="112.0" height="56" rx="11" fill="#be123c" stroke="#be123c" filter="url(#shadow)"/>
+<text x="785.5" y="683.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">!=</text>
+<text x="785.5" y="701.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Distinto de</text>
+</g>
+<g><rect x="640.5" y="773.0" width="130.5" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="705.8" y="797.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">nombre</text>
+<text x="705.8" y="815.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="809.1" y="773.0" width="112.0" height="56" rx="11" fill="#15803d" stroke="#15803d" filter="url(#shadow)"/>
+<text x="865.1" y="797.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">NULL</text>
+<text x="865.1" y="815.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Lógico</text>
+</g>
+<g><rect x="1042.1" y="545.0" width="112.0" height="56" rx="11" fill="#be123c" stroke="#be123c" filter="url(#shadow)"/>
+<text x="1098.1" y="569.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">==</text>
+<text x="1098.1" y="587.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Igual a</text>
+</g>
+<g><rect x="959.1" y="659.0" width="119.1" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="1018.6" y="683.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">ciudad</text>
+<text x="1018.6" y="701.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="1116.2" y="659.0" width="122.9" height="56" rx="11" fill="#15803d" stroke="#15803d" filter="url(#shadow)"/>
+<text x="1177.6" y="683.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">&#x27;CDMX&#x27;</text>
+<text x="1177.6" y="701.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Cadena</text>
+</g>
+<g><rect x="1277.0" y="431.0" width="177.3" height="56" rx="11" fill="#334155" stroke="#334155" filter="url(#shadow)"/>
+<text x="1365.7" y="455.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Estudiantes</text>
+<text x="1365.7" y="473.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Tabla</text>
+</g>
+<line x1="56" y1="1049" x2="1438.328125" y2="1049" stroke="#e2e8f0" stroke-width="1"/>
+<text x="56" y="1069" font-family="DejaVu Sans" font-size="11" fill="#94a3b8">Generado por el analizador sintáctico del proyecto · Sistema de Apoyo para la Enseñanza del Álgebra Relacional</text>
+<text x="1438.328125" y="1069" text-anchor="end" font-family="DejaVu Sans Mono" font-size="11" fill="#94a3b8">27-literales</text>
+</svg>

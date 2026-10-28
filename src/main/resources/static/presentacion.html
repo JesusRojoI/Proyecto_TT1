@@ -3,105 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acerca de la herramienta - TT1</title>
+    <title>Acerca de la herramienta · TT1</title>
+    <meta name="description" content="Información general, funcionalidades y arquitectura del sistema de apoyo para la enseñanza del álgebra relacional.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        h1, h2, h3 { font-family: 'Quicksand', sans-serif; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Roboto+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/app.v4.css">
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body>
 
-    <header class="bg-slate-800 text-white py-8 shadow-md">
-        <div class="container mx-auto max-w-4xl px-6 text-center">
-            <h1 class="text-3xl font-bold tracking-tight">Sistema de Apoyo para la Enseñanza del Álgebra Relacional</h1>
-            <p class="text-sm text-slate-300 mt-2">IPN &middot; ESCOM &middot; Trabajo Terminal 2027-A159</p>
+    <header class="app-header">
+        <div class="header-inner">
+            <a class="brand" href="/" aria-label="Ir al inicio">
+                <span class="brand-mark" aria-hidden="true">Σ</span>
+                <span class="brand-copy">
+                    <strong>Álgebra Relacional</strong>
+                    <small>IPN · ESCOM · TT 2027-A159</small>
+                </span>
+            </a>
+            <nav class="top-nav" aria-label="Navegación principal">
+                <a href="/"><i class="bi bi-pencil-square" aria-hidden="true"></i> Herramienta</a>
+                <a href="/presentacion.html" class="active" aria-current="page"><i class="bi bi-info-circle" aria-hidden="true"></i> Acerca de</a>
+                <a href="/instalacion.html"><i class="bi bi-terminal" aria-hidden="true"></i> Instalación</a>
+                <a href="/terminos.html"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> Términos</a>
+                <a href="/api/manual" download class="nav-manual"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Manual</a>
+            </nav>
         </div>
     </header>
 
-    <main class="container mx-auto max-w-4xl px-6 py-10">
-
-        <section class="bg-white rounded shadow-sm border border-slate-200 p-6 mb-6">
-            <h2 class="text-xl font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                <i class="bi bi-info-circle text-blue-800"></i> &iquest;Qu&eacute; es esta herramienta?
-            </h2>
-            <p class="text-slate-600 leading-relaxed">
-                Es un sistema web pedag&oacute;gico que permite a los estudiantes de bases de datos escribir consultas en
-                &Aacute;lgebra Relacional y visualizar, paso a paso, c&oacute;mo se transforman en sentencias SQL equivalentes.
-                A diferencia de otras herramientas existentes, expone el proceso completo: an&aacute;lisis l&eacute;xico,
-                an&aacute;lisis sint&aacute;ctico, construcci&oacute;n del &aacute;rbol, traducci&oacute;n a SQL y ejecuci&oacute;n sobre una base de datos real.
+    <main class="info-main">
+        <section class="info-hero">
+            <span class="info-kicker">Trabajo Terminal 2027-A159</span>
+            <h1>Sistema de Apoyo para la Enseñanza del Álgebra Relacional</h1>
+            <p>
+                Herramienta web pedagógica que permite escribir consultas de álgebra relacional, observar cada etapa del
+                análisis léxico y sintáctico, consultar el árbol de sintaxis generado con Graphviz y obtener la sentencia
+                SQL equivalente ejecutada sobre una base de datos MySQL real.
             </p>
         </section>
 
-        <section class="bg-white rounded shadow-sm border border-slate-200 p-6 mb-6">
-            <h2 class="text-xl font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                <i class="bi bi-diagram-3 text-blue-800"></i> Funcionalidades principales
-            </h2>
-            <ul class="space-y-3 text-slate-600">
-                <li class="flex gap-3"><i class="bi bi-check2-circle text-emerald-700 mt-1"></i>
-                    <span>Editor interactivo (Monaco Editor) con tooltips explicativos y botones para insertar operadores (&sigma;, &pi;, &cup;, &cap;, &minus;, &times;, &#8904;, &gamma;).</span></li>
-                <li class="flex gap-3"><i class="bi bi-check2-circle text-emerald-700 mt-1"></i>
-                    <span>Conexión con el MySQL local del usuario: explora sus bases de datos y expone el diccionario de datos de cada tabla.</span></li>
-                <li class="flex gap-3"><i class="bi bi-check2-circle text-emerald-700 mt-1"></i>
-                    <span>An&aacute;lisis l&eacute;xico y sint&aacute;ctico con JFlex y Java CUP (parser LALR), con tokenizaci&oacute;n visible y cat&aacute;logo de errores.</span></li>
-                <li class="flex gap-3"><i class="bi bi-check2-circle text-emerald-700 mt-1"></i>
-                    <span>Visualizaci&oacute;n del &aacute;rbol sint&aacute;ctico y traducci&oacute;n autom&aacute;tica a SQL, incluyendo operadores anidados y funciones trigonom&eacute;tricas.</span></li>
-                <li class="flex gap-3"><i class="bi bi-check2-circle text-emerald-700 mt-1"></i>
-                    <span>Ejecuci&oacute;n de la consulta sobre la base de datos real y vista previa del contenido de cada tabla.</span></li>
-                <li class="flex gap-3"><i class="bi bi-check2-circle text-emerald-700 mt-1"></i>
-                    <span>Historial de consultas con soporte para variables reutilizables (&#64;1, &#64;2, ...).</span></li>
+        <section class="card info-card">
+            <h2><i class="bi bi-info-circle" aria-hidden="true"></i> ¿Qué es esta herramienta?</h2>
+            <p>
+                Es un sistema institucional del Instituto Politécnico Nacional, desarrollado en la Escuela Superior de
+                Cómputo, cuyo propósito es apoyar a los estudiantes en la comprensión de la traducción entre el álgebra
+                relacional y SQL. A diferencia de otras herramientas, expone el proceso completo: tokenización,
+                análisis sintáctico, construcción del árbol, traducción y ejecución sobre datos reales.
+            </p>
+        </section>
+
+        <section class="card info-card">
+            <h2><i class="bi bi-diagram-3" aria-hidden="true"></i> Funcionalidades principales</h2>
+            <ul>
+                <li><strong>Editor interactivo</strong> basado en Monaco Editor, con resaltado de sintaxis, tooltips explicativos y botones para insertar operadores.</li>
+                <li><strong>Conexión con MySQL local</strong> usando las credenciales del usuario, sin almacenarlas en el servidor.</li>
+                <li><strong>Diccionario de datos</strong> de la base seleccionada: tablas, atributos, llaves, relaciones y vista previa de su contenido.</li>
+                <li><strong>Autocompletado inteligente</strong>: al escribir un atributo, el sistema recomienda la tabla a la que pertenece; si el atributo se comparte entre tablas, muestra todas las opciones válidas. Se acepta con <strong>Tab</strong>.</li>
+                <li><strong>Análisis léxico y sintáctico</strong> con JFlex y Java CUP, con catálogo de errores y posición exacta del fallo.</li>
+                <li><strong>Árbol sintáctico con Graphviz</strong> en una ventana amplia, con controles de zoom, ajuste a la ventana y descarga en formato JPG.</li>
+                <li><strong>Traducción automática a SQL</strong> y ejecución de la consulta sobre la base de datos seleccionada.</li>
             </ul>
         </section>
 
-        <section class="bg-white rounded shadow-sm border border-slate-200 p-6 mb-6">
-            <h2 class="text-xl font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                <i class="bi bi-stack text-blue-800"></i> Arquitectura y tecnolog&iacute;as
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                <div class="border border-slate-200 rounded-sm p-4">
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Capa de presentaci&oacute;n</p>
-                    <p class="text-sm text-slate-700">HTML5, Tailwind CSS, Monaco Editor, JavaScript</p>
+        <section class="card info-card">
+            <h2><i class="bi bi-stack" aria-hidden="true"></i> Arquitectura y tecnologías</h2>
+            <div class="info-grid">
+                <div class="info-tile">
+                    <p class="label">Capa de presentación</p>
+                    <p>HTML5, CSS3, Tailwind CSS, Monaco Editor, Viz.js (Graphviz) y JavaScript.</p>
                 </div>
-                <div class="border border-slate-200 rounded-sm p-4">
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Capa l&oacute;gica</p>
-                    <p class="text-sm text-slate-700">Java 21, Spring Boot, JFlex, Java CUP</p>
+                <div class="info-tile">
+                    <p class="label">Capa lógica</p>
+                    <p>Java 21, Spring Boot, JFlex y Java CUP. Generación de DOT para Graphviz.</p>
                 </div>
-                <div class="border border-slate-200 rounded-sm p-4">
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Capa de datos</p>
-                    <p class="text-sm text-slate-700">MySQL local del usuario, JDBC</p>
+                <div class="info-tile">
+                    <p class="label">Capa de datos</p>
+                    <p>MySQL local del usuario mediante JDBC. Consultas de solo lectura.</p>
                 </div>
             </div>
         </section>
 
-        <section class="bg-white rounded shadow-sm border border-slate-200 p-6 mb-6">
-            <h2 class="text-xl font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                <i class="bi bi-hourglass-split text-blue-800"></i> Estado del proyecto
-            </h2>
-            <p class="text-slate-600 leading-relaxed mb-3">
-                Esta es la <strong>primera versi&oacute;n</strong> del Trabajo Terminal I. La generaci&oacute;n autom&aacute;tica de
-                diagramas entidad-relaci&oacute;n y del modelo relacional se implementar&aacute; en el Trabajo Terminal II.
+        <section class="card info-card">
+            <h2><i class="bi bi-hourglass-split" aria-hidden="true"></i> Estado del proyecto</h2>
+            <p>
+                Esta es la <strong>primera versión</strong> del Trabajo Terminal I. La generación automática de diagramas
+                entidad-relación y del modelo relacional se implementará en el Trabajo Terminal II.
             </p>
-            <ul class="space-y-2 text-slate-500 text-sm">
-                <li><i class="bi bi-dot"></i> Diagramas entidad-relaci&oacute;n y modelo relacional (TT-2).</li>
-                <li><i class="bi bi-dot"></i> Sustituci&oacute;n de palabras por s&iacute;mbolos griegos en el an&aacute;lisis l&eacute;xico (c&oacute;digos unicode).</li>
-                <li><i class="bi bi-dot"></i> Gesti&oacute;n de roles (alumno / profesor) y m&oacute;dulo de administraci&oacute;n de esquemas.</li>
+            <ul>
+                <li>Diagramas entidad-relación y modelo relacional (TT-2).</li>
+                <li>Sustitución de palabras por símbolos griegos en el análisis léxico.</li>
+                <li>Gestión de roles (alumno / profesor) y módulo de administración de esquemas.</li>
             </ul>
+            <div class="info-actions">
+                <a href="/" class="btn btn-primary"><i class="bi bi-play-circle" aria-hidden="true"></i> Ir a la herramienta</a>
+                <a href="/api/manual" download class="btn btn-outline"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Descargar manual de usuario</a>
+            </div>
         </section>
 
-        <div class="flex flex-wrap gap-3 justify-center mt-8">
-            <a href="/" class="bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-sm border border-blue-900 transition flex items-center gap-2">
-                <i class="bi bi-play-circle"></i> Ir a la herramienta
-            </a>
-            <button disabled
-               class="bg-slate-300 text-slate-500 px-6 py-3 rounded-sm border border-slate-300 cursor-not-allowed flex items-center gap-2"
-               title="Disponible pr&oacute;ximamente">
-                <i class="bi bi-file-earmark-pdf"></i> Manual de usuario (pr&oacute;ximamente)
-            </button>
-        </div>
-
+        <section class="card info-card">
+            <h2><i class="bi bi-journal-text" aria-hidden="true"></i> Recursos del proyecto</h2>
+            <p>Consulta la guía de instalación y las condiciones de uso antes de desplegar el sistema en tu equipo o máquina virtual.</p>
+            <div class="info-links">
+                <a class="info-link" href="/instalacion.html">
+                    <i class="bi bi-terminal" aria-hidden="true"></i>
+                    <span><strong>Guía de instalación</strong><span>Clonar y ejecutar en una VM</span></span>
+                </a>
+                <a class="info-link" href="/terminos.html">
+                    <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+                    <span><strong>Términos y condiciones</strong><span>Uso académico y responsabilidad</span></span>
+                </a>
+                <a class="info-link" href="/api/manual" download>
+                    <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+                    <span><strong>Manual de usuario</strong><span>Descarga local en PDF</span></span>
+                </a>
+            </div>
+        </section>
     </main>
 
+    <footer class="app-footer">
+        <div class="footer-inner">
+            <p><strong>TT 2027-A159</strong> · Instituto Politécnico Nacional · ESCOM</p>
+            <nav aria-label="Enlaces del pie de página">
+                <a href="/presentacion.html">Acerca de</a>
+                <a href="/instalacion.html">Guía de instalación</a>
+                <a href="/terminos.html">Términos y condiciones</a>
+                <a href="/api/manual" download>Manual de usuario</a>
+            </nav>
+        </div>
+    </footer>
 </body>
 </html>

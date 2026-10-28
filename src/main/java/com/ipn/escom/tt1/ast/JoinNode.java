@@ -1,5 +1,7 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,6 +43,17 @@ public class JoinNode extends Expression {
             sb.append(condition.toTreeString(level + 2));
         }
         return sb.toString();
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        List<Map<String, Object>> children = new ArrayList<>();
+        children.add(TreeNode.child(left.toTree(), "izquierda"));
+        children.add(TreeNode.child(right.toTree(), "derecha"));
+        if (condition != null) {
+            children.add(TreeNode.child(condition.toTree(), "condición"));
+        }
+        return TreeNode.of("⋈", condition == null ? "Reunión natural" : "Reunión theta", "join", children);
     }
 
     @Override

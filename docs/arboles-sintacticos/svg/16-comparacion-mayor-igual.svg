@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="730" viewBox="0 0 1040 730">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.16"/></filter><linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2563eb"/><stop offset="0.5" stop-color="#0d9488"/><stop offset="1" stop-color="#7e22ce"/></linearGradient></defs>
+<rect width="1040" height="730" fill="#ffffff"/>
+<rect x="0" y="0" width="1040" height="7" fill="url(#accent)"/>
+<text x="56" y="74" font-family="DejaVu Sans" font-weight="bold" font-size="12" letter-spacing="1.6" fill="#64748b">ÁLGEBRA RELACIONAL · TT1 · ÁRBOL DE SINTAXIS</text>
+<text x="56" y="119" font-family="DejaVu Sans" font-weight="bold" font-size="29" fill="#0f172a">Comparador mayor o igual (&gt;=)</text>
+<rect x="56" y="135" width="928" height="57" rx="12" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="56" y="135" width="4" height="57" rx="2" fill="#2563eb"/>
+<text x="78" y="162" font-family="DejaVu Sans" font-size="15" fill="#0f172a">σ(salario &gt;= 15000)(Empleados)</text>
+<text x="56" y="222" font-family="DejaVu Sans" font-size="13" fill="#475569">Los comparadores de signo producen un nodo de comparación dentro de la condición.</text>
+<text x="56" y="248" font-family="DejaVu Sans" font-size="11" fill="#94a3b8">Producción: expr ::= expr GE expr</text>
+<path d="M 547.1 352.0 C 547.1 381.0, 419.3 381.0, 419.3 410.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="449.9" y="376.0" width="66.6" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="483.2" y="388.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">condición</text>
+<path d="M 419.3 466.0 C 419.3 495.0, 341.9 495.0, 341.9 524.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="348.2" y="490.0" width="64.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="380.6" y="502.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">izquierda</text>
+<path d="M 419.3 466.0 C 419.3 495.0, 496.8 495.0, 496.8 524.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="428.8" y="490.0" width="58.5" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="458.0" y="502.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">derecha</text>
+<path d="M 547.1 352.0 C 547.1 381.0, 674.9 381.0, 674.9 410.0" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round"/>
+<rect x="586.2" y="376.0" width="49.7" height="17" rx="8.5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="611.0" y="388.0" text-anchor="middle" font-family="DejaVu Sans" font-size="11" fill="#64748b">fuente</text>
+<g><rect x="491.1" y="296.0" width="112.0" height="56" rx="11" fill="#2563eb" stroke="#2563eb" filter="url(#shadow)"/>
+<text x="547.1" y="320.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">σ</text>
+<text x="547.1" y="338.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Selección</text>
+</g>
+<g><rect x="349.4" y="410.0" width="139.8" height="56" rx="11" fill="#be123c" stroke="#be123c" filter="url(#shadow)"/>
+<text x="419.3" y="434.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">&gt;=</text>
+<text x="419.3" y="452.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Mayor o igual que</text>
+</g>
+<g><rect x="281.7" y="524.0" width="120.2" height="56" rx="11" fill="#475569" stroke="#475569" filter="url(#shadow)"/>
+<text x="341.9" y="548.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">salario</text>
+<text x="341.9" y="566.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Atributo</text>
+</g>
+<g><rect x="440.0" y="524.0" width="113.6" height="56" rx="11" fill="#15803d" stroke="#15803d" filter="url(#shadow)"/>
+<text x="496.8" y="548.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">15000</text>
+<text x="496.8" y="566.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Número</text>
+</g>
+<g><rect x="591.6" y="410.0" width="166.7" height="56" rx="11" fill="#334155" stroke="#334155" filter="url(#shadow)"/>
+<text x="674.9" y="434.0" text-anchor="middle" font-family="DejaVu Sans" font-weight="bold" font-size="20" fill="#ffffff">Empleados</text>
+<text x="674.9" y="452.0" text-anchor="middle" font-family="DejaVu Sans" font-size="12" fill="#ffffff" fill-opacity="0.84">Tabla</text>
+</g>
+<line x1="56" y1="686" x2="984" y2="686" stroke="#e2e8f0" stroke-width="1"/>
+<text x="56" y="706" font-family="DejaVu Sans" font-size="11" fill="#94a3b8">Generado por el analizador sintáctico del proyecto · Sistema de Apoyo para la Enseñanza del Álgebra Relacional</text>
+<text x="984" y="706" text-anchor="end" font-family="DejaVu Sans Mono" font-size="11" fill="#94a3b8">16-comparacion-mayor-igual</text>
+</svg>

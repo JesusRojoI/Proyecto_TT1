@@ -1,6 +1,7 @@
 package com.ipn.escom.tt1.service;
 
 import com.ipn.escom.tt1.ast.AssignNode;
+import com.ipn.escom.tt1.ast.DotTreeBuilder;
 import com.ipn.escom.tt1.ast.Expression;
 import com.ipn.escom.tt1.parser.Lexer;
 import com.ipn.escom.tt1.parser.LexicalException;
@@ -16,8 +17,12 @@ import java.util.*;
 @Service
 public class TranslationService {
 
+    /**
+     * Relaciones temporales creadas con la forma {@code @n <- ...}. Se conserva
+     * únicamente para resolver variables dentro de una expresión; no se expone
+     * como historial en la interfaz.
+     */
     private final Map<String, Expression> history = new LinkedHashMap<>();
-    private int counter = 0;
 
     /**
      * Procesa una expresión de álgebra relacional: la tokeniza, la analiza
@@ -26,24 +31,24 @@ public class TranslationService {
      */
     public synchronized Map<String, Object> process(String rawExpression) throws Exception {
         Map<String, Object> response = new LinkedHashMap<>();
-        String expression = rawExpression == null ? "" : rawExpression.trim();
+        String expression = rawExpression == null ? "" : rawExpression;
         List<Map<String, Object>> tokens = new ArrayList<>();
 
         try {
             tokenize(expression, tokens);
         } catch (LexicalException le) {
-            return error(response, "LEX-01", le.getMessage(),
-                    le.getLine(), le.getColumn(), tokens, null);
+            return error(response, "LEX-01", le.getMessage(), le.getLine(), le.getColumn(),
+                    expression, tokens, null);
         } catch (IOException ioe) {
             return error(response, "LEX-99",
                     "Error inesperado durante el análisis léxico: " + ioe.getMessage(),
-                    -1, -1, tokens, null);
+                    -1, -1, expression, tokens, null);
         }
 
-        if (expression.isEmpty()) {
+        if (expression.trim().isEmpty()) {
             return error(response, "SIN-00",
                     "No se ingresó ninguna expresión de álgebra relacional.",
-                    -1, -1, tokens, null);
+                    -1, -1, expression, tokens, null);
         }
 
         Expression ast;
@@ -52,17 +57,18 @@ public class TranslationService {
             ast = (Expression) p.parse().value;
         } catch (SyntaxException se) {
             return error(response, se.getCode(), se.getMessage(),
-                    se.getLine(), se.getColumn(), tokens, se.getExpected());
+                    se.getLine(), se.getColumn(), expression, tokens, se.getExpected());
         } catch (LexicalException le) {
             return error(response, "LEX-01", le.getMessage(),
-                    le.getLine(), le.getColumn(), tokens, null);
+                    le.getLine(), le.getColumn(), expression, tokens, null);
         } catch (Exception e) {
             return error(response, "SIN-02",
                     "Error sintáctico: " + (e.getMessage() != null ? e.getMessage() : e.toString()),
-                    -1, -1, tokens, null);
+                    -1, -1, expression, tokens, null);
         }
 
         String saved = null;
+        Expression treeAst = ast;
         if (ast instanceof AssignNode assign) {
             saved = assign.getName();
             ast = assign.getBody();
@@ -72,15 +78,16 @@ public class TranslationService {
             history.put(saved, ast);
         }
 
+        Map<String, Object> treeData = treeAst.toTree();
         response.put("status", "success");
         response.put("sql", ast.asQuery());
-        response.put("tree", ast.toTreeString(0));
-        response.put("expanded", ast.asQuery());
+        response.put("tree", treeAst.toTreeString(0));
+        response.put("treeData", treeData);
+        response.put("treeDot", DotTreeBuilder.build(treeData));
         response.put("tokens", tokens);
         if (saved != null) {
             response.put("saved", saved);
         }
-        response.put("historyKeys", String.join(", ", history.keySet()));
         return response;
     }
 
@@ -108,20 +115,53 @@ public class TranslationService {
     }
 
     private Map<String, Object> error(Map<String, Object> response, String code, String message,
-                                      int line, int column, List<Map<String, Object>> tokens,
+                                      int line, int column, String expression,
+                                      List<Map<String, Object>> tokens,
                                       List<String> expected) {
         response.put("status", "error");
         response.put("errorCode", code);
         response.put("message", "[" + code + "] " + message);
         response.put("detail", catalog(code));
+        int offset = offsetOf(expression, line, column);
+        response.put("offset", offset);
+        response.put("position", offset + 1);
+        response.put("errorLength", Math.min(1, Math.max(0, expression.length() - offset)));
         if (line >= 0) response.put("line", line);
         if (column >= 0) response.put("column", column);
         if (expected != null && !expected.isEmpty()) {
             response.put("expected", expected);
         }
         response.put("tokens", tokens);
-        response.put("historyKeys", String.join(", ", history.keySet()));
         return response;
+    }
+
+    /**
+     * Convierte la línea y columna (1-based) reportadas por el analizador en el
+     * índice absoluto del carácter dentro de la expresión (0-based). Si el
+     * error ocurrió al final de la entrada se devuelve la longitud total.
+     */
+    private static int offsetOf(String text, int line, int column) {
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
+        if (line <= 0) {
+            return text.length();
+        }
+        int currentLine = 1;
+        int index = 0;
+        while (index < text.length() && currentLine < line) {
+            char c = text.charAt(index++);
+            if (c == '\n') {
+                currentLine++;
+            } else if (c == '\r') {
+                if (index < text.length() && text.charAt(index) == '\n') {
+                    index++;
+                }
+                currentLine++;
+            }
+        }
+        int safeColumn = Math.max(column, 1);
+        return Math.min(index + safeColumn - 1, text.length());
     }
 
     /** Catálogo de violaciones sintácticas y léxicas reconocidas por el sistema. */
@@ -152,7 +192,7 @@ public class TranslationService {
             case "MAX":         return "Función de agregación MAX (máximo).";
             case "MIN":         return "Función de agregación MIN (mínimo).";
             case "COUNT":       return "Función de agregación COUNT (conteo).";
-            case "FUNCTION":    return "Función trigonométrica o matemática.";
+            case "FUNCTION":    return "Función matemática.";
             case "PLUS":        return "Operador aritmético de suma (+).";
             case "MINUS":       return "Operador de resta o diferencia (−).";
             case "TIMES":       return "Operador de multiplicación o producto (×).";
@@ -184,12 +224,4 @@ public class TranslationService {
         }
     }
 
-    public synchronized void clearHistory() {
-        history.clear();
-        counter = 0;
-    }
-
-    public synchronized Map<String, Expression> getHistory() {
-        return new LinkedHashMap<>(history);
-    }
 }

@@ -30,6 +30,11 @@ public class VariableNode extends Expression {
     }
 
     @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.leaf(name, "Variable", "variable");
+    }
+
+    @Override
     public Expression expand(Map<String, Expression> history) {
         Expression stored = history.get(name);
         if (stored == null) {

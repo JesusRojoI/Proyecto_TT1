@@ -1,5 +1,7 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.Map;
+
 /**
  * Referencia a un atributo (columna). Puede ser simple ({@code edad}) o
  * cualificado con el nombre de la tabla ({@code Estudiantes.edad}).
@@ -31,5 +33,11 @@ public class AttributeNode extends ScalarExpression {
     public String toTreeString(int level) {
         String label = table == null ? name : table + "." + name;
         return "  ".repeat(level) + "Atributo: " + label + "\n";
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        String label = table == null ? name : table + "." + name;
+        return TreeNode.leaf(label, "Atributo", "attribute");
     }
 }

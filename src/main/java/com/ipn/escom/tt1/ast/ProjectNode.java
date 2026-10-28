@@ -1,5 +1,6 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +28,13 @@ public class ProjectNode extends Expression {
                attributes.toTreeString(level + 1) +
                "  ".repeat(level + 1) + "Fuente:\n" +
                source.toTreeString(level + 2);
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.of("π", "Proyección", "project", List.of(
+                TreeNode.child(attributes.toTree(), "atributos"),
+                TreeNode.child(source.toTree(), "fuente")));
     }
 
     @Override

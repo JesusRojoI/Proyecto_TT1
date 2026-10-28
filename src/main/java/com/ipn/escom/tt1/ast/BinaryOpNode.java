@@ -1,5 +1,6 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +53,23 @@ public class BinaryOpNode extends Expression {
         return "  ".repeat(level) + treeLabel() + "\n" +
                left.toTreeString(level + 1) +
                right.toTreeString(level + 1);
+    }
+
+    private String symbol() {
+        switch (operator) {
+            case "UNION":      return "∪";
+            case "INTERSECT":  return "∩";
+            case "DIFFERENCE": return "−";
+            case "PRODUCT":    return "×";
+            default:           return operator;
+        }
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.of(symbol(), treeLabel(), "set", List.of(
+                TreeNode.child(left.toTree(), "izquierda"),
+                TreeNode.child(right.toTree(), "derecha")));
     }
 
     @Override

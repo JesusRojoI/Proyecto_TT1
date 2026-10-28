@@ -1,5 +1,6 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +33,14 @@ public class GroupNode extends Expression {
                aggregates.toTreeString(level + 1) +
                "  ".repeat(level + 1) + "Fuente:\n" +
                source.toTreeString(level + 2);
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.of("γ", "Agrupación", "group", List.of(
+                TreeNode.child(groupAttributes.toTree(), "agrupar por"),
+                TreeNode.child(aggregates.toTree(), "agregados"),
+                TreeNode.child(source.toTree(), "fuente")));
     }
 
     @Override

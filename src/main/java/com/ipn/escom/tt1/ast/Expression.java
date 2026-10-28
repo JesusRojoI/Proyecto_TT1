@@ -13,6 +13,12 @@ public abstract class Expression {
     public abstract String toTreeString(int level);
 
     /**
+     * Representación estructurada del árbol sintáctico para dibujarlo en la
+     * interfaz web.
+     */
+    public abstract Map<String, Object> toTree();
+
+    /**
      * Vista completa de la relación como una consulta SQL ejecutable.
      */
     public String asQuery() {

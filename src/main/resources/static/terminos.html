@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y condiciones · TT1</title>
+    <meta name="description" content="Términos y condiciones de uso del sistema de apoyo para la enseñanza del álgebra relacional.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Roboto+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/app.v4.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-inner">
+            <a class="brand" href="/" aria-label="Ir al inicio">
+                <span class="brand-mark" aria-hidden="true">Σ</span>
+                <span class="brand-copy">
+                    <strong>Álgebra Relacional</strong>
+                    <small>IPN · ESCOM · TT 2027-A159</small>
+                </span>
+            </a>
+            <nav class="top-nav" aria-label="Navegación principal">
+                <a href="/"><i class="bi bi-pencil-square" aria-hidden="true"></i> Herramienta</a>
+                <a href="/presentacion.html"><i class="bi bi-info-circle" aria-hidden="true"></i> Acerca de</a>
+                <a href="/instalacion.html"><i class="bi bi-terminal" aria-hidden="true"></i> Instalación</a>
+                <a href="/terminos.html" class="active" aria-current="page"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> Términos</a>
+                <a href="/api/manual" download class="nav-manual"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Manual</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="info-main">
+        <section class="info-hero">
+            <span class="info-kicker">Condiciones de uso</span>
+            <h1>Términos y condiciones</h1>
+            <p>
+                Al utilizar este sistema aceptas las condiciones descritas en esta página. La herramienta forma parte de
+                un Trabajo Terminal académico del Instituto Politécnico Nacional y se distribuye con fines educativos.
+            </p>
+        </section>
+
+        <section class="card info-card">
+            <h2><i class="bi bi-1-circle" aria-hidden="true"></i> Objeto y alcance</h2>
+            <p>
+                El sistema de apoyo para la enseñanza del álgebra relacional permite analizar expresiones, construir su
+                árbol sintáctico con Graphviz, traducirlas a SQL y ejecutar consultas de lectura sobre una base de datos
+                MySQL local. Su alcance corresponde al Trabajo Terminal I; las funcionalidades de diagramas entidad-relación
+                y modelo relacional quedan reservadas para el Trabajo Terminal II.
+            </p>
+            <p>
+                La herramienta es un apoyo didáctico. No sustituye la enseñanza, la revisión humana ni la validación
+                formal de consultas en entornos de producción.
+            </p>
+        </section>
+
+        <section class="card info-card">
+            <h2><i class="bi bi-2-circle" aria-hidden="true"></i> Uso académico</h2>
+            <ul>
+                <li>El uso permitido es académico, personal o institucional, sin fines comerciales.</li>
+                <li>No se autoriza su uso para actividades ilícitas, para vulnerar sistemas o para acceder a datos sin autorización.</li>
+                <li>El usuario debe respetar las normas de la institución y los derechos de autor de terceros.</li>
+                <li>La herramienta puede utilizarse en clases, laboratorios y demostraciones académicas citando su origen.</li>
+            </ul>
+        </section>
+
+        <section class="card info-card">
+            <h2><i class="bi bi-3-circle" aria-hidden="true"></i> Credenciales y datos</h2>
+            <p>
+                Las credenciales de MySQL se ingresan directamente en la interfaz y se mantienen únicamente en la memoria
+                de la sesión del servidor local. No se envían a servicios externos ni se almacenan en archivos del proyecto.
+            </p>
+            <ul>
+                <li>El usuario es responsable de la veracidad y confidencialidad de sus credenciales.</li>
+                <li>El sistema ejecuta únicamente consultas de lectura (<code>SELECT</code>) sobre la base seleccionada.</li>
+                <li>El usuario debe contar con autorización para consultar la base de datos que utilice.</li>
+                <li>No se recopilan datos personales ni se envían métricas de uso a terceros.</li>
+            </ul>
+            <div class="warn">
+                No utilices credenciales de producción en equipos compartidos. Cierra la conexión desde la interfaz cuando
+                termines de trabajar.
+            </div>
+        </section>
+
+        <section class="card info-card">
+            <h2><i class="bi bi-4-circle" aria-hidden="true"></i> Responsabilidad y garantías</h2>
+            <p>
+                El software se proporciona <strong>tal cual</strong>, sin garantías expresas ni implícitas de exactitud,
+                disponibilidad o idoneidad para un fin particular. Los autores y la institución no se hacen responsables
+                de pérdidas de datos, interrupciones, errores de traducción o daños derivados del uso de la herramienta.
+            </p>
+            <ul>
+                <li>El usuario debe respaldar su base de datos antes de realizar pruebas.</li>
+                <li>Las consultas generadas deben revisarse antes de utilizarse en entornos reales.</li>
+                <li>El equipo puede actualizar, modificar o suspender la herramienta sin previo aviso.</li>
+            </ul>
+        </section>
+
+        <section class="card info-card">
+            <h2><i class="bi bi-5-circle" aria-hidden="true"></i> Propiedad intelectual</h2>
+            <p>
+                El código, la documentación y los materiales gráficos del proyecto pertenecen a sus autores y se desarrollan
+                en el marco del Instituto Politécnico Nacional. Se permite su consulta y uso académico; cualquier
+                reproducción, distribución o modificación debe reconocer la autoría y respetar las disposiciones institucionales.
+            </p>
+            <p>
+                Las bibliotecas de terceros conservan sus propias licencias: Spring Boot, JFlex, Java CUP, Monaco Editor,
+                Tailwind CSS, Graphviz/Viz.js y Bootstrap Icons.
+            </p>
+        </section>
+
+        <section class="card info-card">
+            <h2><i class="bi bi-6-circle" aria-hidden="true"></i> Privacidad</h2>
+            <p>
+                La aplicación se ejecuta en el equipo del usuario y no incorpora servicios de analítica ni rastreo. El
+                diccionario y las consultas se procesan localmente. El único tráfico externo corresponde a la carga de
+                tipografías, iconos y Monaco Editor desde redes de distribución de contenido, cuando hay conexión a internet.
+            </p>
+        </section>
+
+        <section class="card info-card">
+            <h2><i class="bi bi-7-circle" aria-hidden="true"></i> Vigencia y contacto</h2>
+            <p>
+                Estos términos entran en vigor en la fecha de consulta y pueden actualizarse cuando el proyecto lo requiera.
+                Para dudas académicas o técnicas, utiliza los canales de comunicación del equipo responsable del Trabajo
+                Terminal 2027-A159 de la Escuela Superior de Cómputo.
+            </p>
+            <p class="text-slate-500 text-xs">Última actualización: 27 de octubre de 2026.</p>
+            <div class="info-actions">
+                <a href="/" class="btn btn-primary"><i class="bi bi-play-circle" aria-hidden="true"></i> Ir a la herramienta</a>
+                <a href="/instalacion.html" class="btn btn-outline"><i class="bi bi-terminal" aria-hidden="true"></i> Guía de instalación</a>
+                <a href="/api/manual" download class="btn btn-outline"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Manual de usuario</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-inner">
+            <p><strong>TT 2027-A159</strong> · Instituto Politécnico Nacional · ESCOM</p>
+            <nav aria-label="Enlaces del pie de página">
+                <a href="/presentacion.html">Acerca de</a>
+                <a href="/instalacion.html">Guía de instalación</a>
+                <a href="/terminos.html">Términos y condiciones</a>
+                <a href="/api/manual" download>Manual de usuario</a>
+            </nav>
+        </div>
+    </footer>
+</body>
+</html>

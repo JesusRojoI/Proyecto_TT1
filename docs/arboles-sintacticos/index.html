@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Árboles sintácticos · TT1 Álgebra Relacional</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f1f5f9; color: #0f172a;
+         font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif; }
+  header { background: #0f172a; color: #fff; padding: 44px 28px 38px; }
+  header .inner { max-width: 1180px; margin: 0 auto; }
+  header .kicker { font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+                    color: #7dd3fc; font-weight: 700; }
+  header h1 { margin: 10px 0 8px; font-size: clamp(26px, 4vw, 38px); line-height: 1.15; }
+  header p { margin: 0; color: #cbd5e1; max-width: 760px; line-height: 1.6; }
+  main { max-width: 1180px; margin: 0 auto; padding: 36px 22px 64px; }
+  .hint { margin: 0 0 26px; color: #475569; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; overflow: hidden;
+           box-shadow: 0 10px 24px -18px rgba(15,23,42,.35); display: flex; flex-direction: column; }
+  .thumb { display: block; background: #f8fafc; border-bottom: 1px solid #e2e8f0; aspect-ratio: 16 / 10;
+            overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center;
+                transition: transform .25s ease; }
+  .thumb:hover img { transform: scale(1.025); }
+  .body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .eyebrow { font-family: "DejaVu Sans Mono", ui-monospace, monospace; font-size: 11px;
+              color: #0d9488; font-weight: 700; letter-spacing: .06em; }
+  h2 { margin: 0; font-size: 17px; line-height: 1.35; }
+  .expr { display: block; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 9px;
+           padding: 10px 12px; font-family: "DejaVu Sans Mono", ui-monospace, monospace;
+           font-size: 12px; line-height: 1.55; color: #334155; overflow-wrap: anywhere; }
+  .body p { margin: 0; font-size: 13px; line-height: 1.55; color: #475569; }
+  .body .rule { font-family: "DejaVu Sans Mono", ui-monospace, monospace; font-size: 10.5px;
+                 color: #94a3b8; overflow-wrap: anywhere; }
+  .links { display: flex; gap: 14px; margin-top: auto; padding-top: 8px; }
+  .links a { font-size: 12px; font-weight: 700; color: #2563eb; text-decoration: none; }
+  .links a:hover { text-decoration: underline; }
+  footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px 40px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="inner">
+    <div class="kicker">Proyecto TT1 · Analizador sintáctico</div>
+    <h1>Árboles de sintaxis del álgebra relacional</h1>
+    <p>Colección de árboles generados por el analizador del proyecto, uno por cada
+       operador y construcción de la gramática. Cada imagen es independiente e incluye
+       la expresión de origen, la producción aplicada y el árbol resultante.</p>
+  </div>
+</header>
+<main>
+  <p class="hint">Haz clic en cualquier imagen para abrirla en tamaño completo.
+     También puedes descargar la versión vectorial (SVG) de cada árbol.</p>
+  <section class="grid">
+        <article class="card">
+          <a class="thumb" href="png/01-seleccion-simple.png" target="_blank" rel="noopener">
+            <img src="png/01-seleccion-simple.png" alt="Selección (σ) con comparador" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">01-seleccion-simple</div>
+            <h2>Selección (σ) con comparador</h2>
+            <code class="expr">σ(edad &gt; 5)(Estudiantes)</code>
+            <p>El nodo σ filtra las tuplas de la relación que cumplen la condición.</p>
+            <p class="rule">relation ::= SELECT LPAREN expr COMMA relation RPAREN</p>
+            <div class="links">
+              <a href="png/01-seleccion-simple.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/01-seleccion-simple.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/02-seleccion-compuesta.png" target="_blank" rel="noopener">
+            <img src="png/02-seleccion-compuesta.png" alt="Selección (σ) con conjunción" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">02-seleccion-compuesta</div>
+            <h2>Selección (σ) con conjunción</h2>
+            <code class="expr">σ(edad &gt;= 18 &amp;&amp; carrera == &quot;ISC&quot;)(Estudiantes)</code>
+            <p>La condición combina dos comparaciones mediante el operador lógico &amp;&amp;.</p>
+            <p class="rule">relation ::= SELECT LPAREN expr RPAREN LPAREN relation RPAREN</p>
+            <div class="links">
+              <a href="png/02-seleccion-compuesta.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/02-seleccion-compuesta.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/03-proyeccion-atributos.png" target="_blank" rel="noopener">
+            <img src="png/03-proyeccion-atributos.png" alt="Proyección (π) de atributos" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">03-proyeccion-atributos</div>
+            <h2>Proyección (π) de atributos</h2>
+            <code class="expr">π(nombre, edad)(Estudiantes)</code>
+            <p>El nodo π conserva únicamente los atributos indicados en la lista.</p>
+            <p class="rule">relation ::= PROJECT LPAREN attrList RPAREN LPAREN relation RPAREN</p>
+            <div class="links">
+              <a href="png/03-proyeccion-atributos.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/03-proyeccion-atributos.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/04-proyeccion-expresion.png" target="_blank" rel="noopener">
+            <img src="png/04-proyeccion-expresion.png" alt="Proyección (π) con expresión aritmética" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">04-proyeccion-expresion</div>
+            <h2>Proyección (π) con expresión aritmética</h2>
+            <code class="expr">π(nombre, salario * 1.1)(Empleados)</code>
+            <p>La lista de proyección admite expresiones escalares, no solo atributos.</p>
+            <p class="rule">relation ::= PROJECT LPAREN attrList RPAREN LPAREN relation RPAREN</p>
+            <div class="links">
+              <a href="png/04-proyeccion-expresion.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/04-proyeccion-expresion.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/05-join-natural.png" target="_blank" rel="noopener">
+            <img src="png/05-join-natural.png" alt="Reunión natural (⋈)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">05-join-natural</div>
+            <h2>Reunión natural (⋈)</h2>
+            <code class="expr">Estudiantes ⋈ Inscripciones</code>
+            <p>Sin condición explícita, la reunión se resuelve por los atributos comunes.</p>
+            <p class="rule">relation ::= relation JOIN relation</p>
+            <div class="links">
+              <a href="png/05-join-natural.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/05-join-natural.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/06-join-theta.png" target="_blank" rel="noopener">
+            <img src="png/06-join-theta.png" alt="Reunión theta (⋈ con condición)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">06-join-theta</div>
+            <h2>Reunión theta (⋈ con condición)</h2>
+            <code class="expr">JOIN(Estudiantes, Inscripciones, Estudiantes.matricula == Inscripciones.matricula)</code>
+            <p>La reunión theta incorpora una condición de comparación entre relaciones.</p>
+            <p class="rule">relation ::= JOIN LPAREN relation COMMA relation COMMA expr RPAREN</p>
+            <div class="links">
+              <a href="png/06-join-theta.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/06-join-theta.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/07-union.png" target="_blank" rel="noopener">
+            <img src="png/07-union.png" alt="Unión (∪)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">07-union</div>
+            <h2>Unión (∪)</h2>
+            <code class="expr">UNION(Estudiantes2023, Estudiantes2024)</code>
+            <p>Combina las tuplas de ambas relaciones eliminando duplicados.</p>
+            <p class="rule">relation ::= UNION LPAREN relation COMMA relation RPAREN</p>
+            <div class="links">
+              <a href="png/07-union.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/07-union.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/08-interseccion.png" target="_blank" rel="noopener">
+            <img src="png/08-interseccion.png" alt="Intersección (∩)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">08-interseccion</div>
+            <h2>Intersección (∩)</h2>
+            <code class="expr">INTERSEC(Estudiantes2023, Estudiantes2024)</code>
+            <p>Conserva las tuplas presentes en las dos relaciones.</p>
+            <p class="rule">relation ::= INTERSEC LPAREN relation COMMA relation RPAREN</p>
+            <div class="links">
+              <a href="png/08-interseccion.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/08-interseccion.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/09-diferencia.png" target="_blank" rel="noopener">
+            <img src="png/09-diferencia.png" alt="Diferencia (−)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">09-diferencia</div>
+            <h2>Diferencia (−)</h2>
+            <code class="expr">DIF(Estudiantes2023, Estudiantes2024)</code>
+            <p>Conserva las tuplas de la primera relación que no están en la segunda.</p>
+            <p class="rule">relation ::= DIFFERENCE LPAREN relation COMMA relation RPAREN</p>
+            <div class="links">
+              <a href="png/09-diferencia.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/09-diferencia.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/10-producto-cartesiano.png" target="_blank" rel="noopener">
+            <img src="png/10-producto-cartesiano.png" alt="Producto cartesiano (×)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">10-producto-cartesiano</div>
+            <h2>Producto cartesiano (×)</h2>
+            <code class="expr">Estudiantes × Carreras</code>
+            <p>Cada tupla de la izquierda se combina con todas las de la derecha.</p>
+            <p class="rule">relation ::= relation PRODUCT relation</p>
+            <div class="links">
+              <a href="png/10-producto-cartesiano.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/10-producto-cartesiano.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/11-agrupacion.png" target="_blank" rel="noopener">
+            <img src="png/11-agrupacion.png" alt="Agrupación (γ) con funciones de agregación" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">11-agrupacion</div>
+            <h2>Agrupación (γ) con funciones de agregación</h2>
+            <code class="expr">γ(carrera; PROM(edad), COUNT(*))(Estudiantes)</code>
+            <p>Agrupa por atributos y calcula agregados sobre cada grupo.</p>
+            <p class="rule">relation ::= GROUP LPAREN attrList SEMICOLON aggList RPAREN LPAREN relation RPAREN</p>
+            <div class="links">
+              <a href="png/11-agrupacion.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/11-agrupacion.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/12-asignacion.png" target="_blank" rel="noopener">
+            <img src="png/12-asignacion.png" alt="Asignación a variable de historial (←)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">12-asignacion</div>
+            <h2>Asignación a variable de historial (←)</h2>
+            <code class="expr">@1 &lt;- π(nombre)(Estudiantes)</code>
+            <p>El resultado se guarda en @1 para reutilizarlo en expresiones posteriores.</p>
+            <p class="rule">relation ::= VARIABLE ASSIGN relation</p>
+            <div class="links">
+              <a href="png/12-asignacion.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/12-asignacion.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/13-variable.png" target="_blank" rel="noopener">
+            <img src="png/13-variable.png" alt="Variable de historial (@n)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">13-variable</div>
+            <h2>Variable de historial (@n)</h2>
+            <code class="expr">@1</code>
+            <p>Hoja que representa una relación previamente guardada.</p>
+            <p class="rule">relation ::= VARIABLE</p>
+            <div class="links">
+              <a href="png/13-variable.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/13-variable.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/14-tabla.png" target="_blank" rel="noopener">
+            <img src="png/14-tabla.png" alt="Relación base (tabla)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">14-tabla</div>
+            <h2>Relación base (tabla)</h2>
+            <code class="expr">Estudiantes</code>
+            <p>Hoja del árbol que representa una tabla de la base de datos.</p>
+            <p class="rule">relation ::= IDENTIFIER</p>
+            <div class="links">
+              <a href="png/14-tabla.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/14-tabla.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/15-expresion-anidada.png" target="_blank" rel="noopener">
+            <img src="png/15-expresion-anidada.png" alt="Expresión anidada (operadores recursivos)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">15-expresion-anidada</div>
+            <h2>Expresión anidada (operadores recursivos)</h2>
+            <code class="expr">π(nombre)(σ(edad &gt;= 18)(Estudiantes ⋈ Inscripciones))</code>
+            <p>Los operadores se anidan libremente: la proyección contiene una selección y esta una reunión.</p>
+            <p class="rule">relation ::= PROJECT ... | SELECT ... | relation JOIN relation</p>
+            <div class="links">
+              <a href="png/15-expresion-anidada.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/15-expresion-anidada.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/16-comparacion-mayor-igual.png" target="_blank" rel="noopener">
+            <img src="png/16-comparacion-mayor-igual.png" alt="Comparador mayor o igual (&gt;=)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">16-comparacion-mayor-igual</div>
+            <h2>Comparador mayor o igual (&gt;=)</h2>
+            <code class="expr">σ(salario &gt;= 15000)(Empleados)</code>
+            <p>Los comparadores de signo producen un nodo de comparación dentro de la condición.</p>
+            <p class="rule">expr ::= expr GE expr</p>
+            <div class="links">
+              <a href="png/16-comparacion-mayor-igual.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/16-comparacion-mayor-igual.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/17-comparacion-distinto.png" target="_blank" rel="noopener">
+            <img src="png/17-comparacion-distinto.png" alt="Comparador distinto (!=)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">17-comparacion-distinto</div>
+            <h2>Comparador distinto (!=)</h2>
+            <code class="expr">σ(carrera != &quot;ISC&quot;)(Estudiantes)</code>
+            <p>El operador != se traduce a &lt;&gt; en la sentencia SQL.</p>
+            <p class="rule">expr ::= expr NE expr</p>
+            <div class="links">
+              <a href="png/17-comparacion-distinto.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/17-comparacion-distinto.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/18-logica-and.png" target="_blank" rel="noopener">
+            <img src="png/18-logica-and.png" alt="Conjunción lógica (∧ / &amp;&amp;)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">18-logica-and</div>
+            <h2>Conjunción lógica (∧ / &amp;&amp;)</h2>
+            <code class="expr">σ(edad &gt; 18 &amp;&amp; calificacion &gt;= 8.5)(Estudiantes)</code>
+            <p>El nodo ∧ exige que ambas comparaciones se cumplan.</p>
+            <p class="rule">expr ::= expr AND expr</p>
+            <div class="links">
+              <a href="png/18-logica-and.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/18-logica-and.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/19-logica-or.png" target="_blank" rel="noopener">
+            <img src="png/19-logica-or.png" alt="Disyunción lógica (∨ / ||)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">19-logica-or</div>
+            <h2>Disyunción lógica (∨ / ||)</h2>
+            <code class="expr">σ(carrera == &quot;ISC&quot; || carrera == &quot;IA&quot;)(Estudiantes)</code>
+            <p>El nodo ∨ exige que al menos una comparación se cumpla.</p>
+            <p class="rule">expr ::= expr OR expr</p>
+            <div class="links">
+              <a href="png/19-logica-or.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/19-logica-or.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/20-negacion-logica.png" target="_blank" rel="noopener">
+            <img src="png/20-negacion-logica.png" alt="Negación lógica (¬ / !)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">20-negacion-logica</div>
+            <h2>Negación lógica (¬ / !)</h2>
+            <code class="expr">σ(!(edad &lt; 18))(Estudiantes)</code>
+            <p>El nodo ¬ invierte el valor de verdad de la condición.</p>
+            <p class="rule">expr ::= NOT expr</p>
+            <div class="links">
+              <a href="png/20-negacion-logica.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/20-negacion-logica.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/21-aritmetica-binaria.png" target="_blank" rel="noopener">
+            <img src="png/21-aritmetica-binaria.png" alt="Aritmética binaria (+, −, ×, ÷)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">21-aritmetica-binaria</div>
+            <h2>Aritmética binaria (+, −, ×, ÷)</h2>
+            <code class="expr">σ(salario * 1.16 + bono &gt; 20000)(Empleados)</code>
+            <p>La precedencia de * sobre + determina la forma del subárbol aritmético.</p>
+            <p class="rule">expr ::= expr PLUS expr | expr MINUS expr | expr TIMES expr | expr DIVIDE expr</p>
+            <div class="links">
+              <a href="png/21-aritmetica-binaria.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/21-aritmetica-binaria.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/22-potencia.png" target="_blank" rel="noopener">
+            <img src="png/22-potencia.png" alt="Potencia (^)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">22-potencia</div>
+            <h2>Potencia (^)</h2>
+            <code class="expr">σ(edad ^ 2 &gt; 100)(Estudiantes)</code>
+            <p>La potencia es asociativa por la derecha y tiene la mayor precedencia aritmética.</p>
+            <p class="rule">expr ::= expr POWER expr</p>
+            <div class="links">
+              <a href="png/22-potencia.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/22-potencia.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/23-menos-unario.png" target="_blank" rel="noopener">
+            <img src="png/23-menos-unario.png" alt="Menos unario (−)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">23-menos-unario</div>
+            <h2>Menos unario (−)</h2>
+            <code class="expr">σ(-edad &lt; -10)(Estudiantes)</code>
+            <p>El signo negativo puede aplicarse a un atributo o a un literal.</p>
+            <p class="rule">expr ::= MINUS expr %prec UMINUS</p>
+            <div class="links">
+              <a href="png/23-menos-unario.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/23-menos-unario.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/24-funcion-matematica.png" target="_blank" rel="noopener">
+            <img src="png/24-funcion-matematica.png" alt="Función matemática" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">24-funcion-matematica</div>
+            <h2>Función matemática</h2>
+            <code class="expr">σ(SQRT(calificacion) &gt;= 3)(Estudiantes)</code>
+            <p>Las funciones matemáticas reciben una lista de argumentos escalares.</p>
+            <p class="rule">expr ::= FUNCTION LPAREN argList RPAREN</p>
+            <div class="links">
+              <a href="png/24-funcion-matematica.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/24-funcion-matematica.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/25-funcion-varios-argumentos.png" target="_blank" rel="noopener">
+            <img src="png/25-funcion-varios-argumentos.png" alt="Función con varios argumentos" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">25-funcion-varios-argumentos</div>
+            <h2>Función con varios argumentos</h2>
+            <code class="expr">π(MOD(salario, 1000))(Empleados)</code>
+            <p>La lista de argumentos se representa como una cadena de nodos con etiquetas arg n.</p>
+            <p class="rule">expr ::= FUNCTION LPAREN argList RPAREN</p>
+            <div class="links">
+              <a href="png/25-funcion-varios-argumentos.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/25-funcion-varios-argumentos.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/26-agregados.png" target="_blank" rel="noopener">
+            <img src="png/26-agregados.png" alt="Funciones de agregación" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">26-agregados</div>
+            <h2>Funciones de agregación</h2>
+            <code class="expr">γ(departamento; SUM(salario), PROM(salario), MAX(salario), MIN(salario), COUNT(*))(Empleados)</code>
+            <p>Cada función de agregación es un nodo independiente dentro de la agrupación.</p>
+            <p class="rule">agg ::= SUM LPAREN expr RPAREN | AVG ... | MAX ... | MIN ... | COUNT LPAREN TIMES RPAREN</p>
+            <div class="links">
+              <a href="png/26-agregados.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/26-agregados.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/27-literales.png" target="_blank" rel="noopener">
+            <img src="png/27-literales.png" alt="Literales (número, cadena, lógico, nulo)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">27-literales</div>
+            <h2>Literales (número, cadena, lógico, nulo)</h2>
+            <code class="expr">σ(edad &gt; 5 &amp;&amp; activo == TRUE &amp;&amp; nombre != NULL &amp;&amp; ciudad == &quot;CDMX&quot;)(Estudiantes)</code>
+            <p>Los literales son hojas del árbol y conservan su tipo.</p>
+            <p class="rule">expr ::= NUMBER | STRING | TRUE | FALSE | NULL</p>
+            <div class="links">
+              <a href="png/27-literales.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/27-literales.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+        <article class="card">
+          <a class="thumb" href="png/28-atributo-cualificado.png" target="_blank" rel="noopener">
+            <img src="png/28-atributo-cualificado.png" alt="Atributo cualificado (tabla.atributo)" loading="lazy">
+          </a>
+          <div class="body">
+            <div class="eyebrow">28-atributo-cualificado</div>
+            <h2>Atributo cualificado (tabla.atributo)</h2>
+            <code class="expr">σ(Estudiantes.edad &gt; Inscripciones.edad)(JOIN(Estudiantes, Inscripciones, Estudiantes.matricula == Inscripciones.matricula))</code>
+            <p>El atributo cualificado evita ambigüedades cuando varias tablas comparten columnas.</p>
+            <p class="rule">expr ::= QUALIFIED</p>
+            <div class="links">
+              <a href="png/28-atributo-cualificado.png" target="_blank" rel="noopener">PNG</a>
+              <a href="svg/28-atributo-cualificado.svg" target="_blank" rel="noopener">SVG</a>
+            </div>
+          </div>
+        </article>
+  </section>
+</main>
+<footer>28 árboles · Sistema de Apoyo para la Enseñanza del Álgebra Relacional</footer>
+</body>
+</html>

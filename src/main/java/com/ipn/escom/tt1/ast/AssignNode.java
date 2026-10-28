@@ -1,5 +1,6 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +30,12 @@ public class AssignNode extends Expression {
     public String toTreeString(int level) {
         return "  ".repeat(level) + "Asignacion: " + name + "\n" +
                body.toTreeString(level + 1);
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.of(name, "Asignación", "assign", List.of(
+                TreeNode.child(body.toTree(), "expresión")));
     }
 
     @Override

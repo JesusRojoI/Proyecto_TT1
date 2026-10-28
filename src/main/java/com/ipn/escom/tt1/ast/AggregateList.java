@@ -2,6 +2,7 @@ package com.ipn.escom.tt1.ast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,5 +36,13 @@ public class AggregateList extends ScalarExpression {
             sb.append(a.toTreeString(level + 1));
         }
         return sb.toString();
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        List<Map<String, Object>> children = aggregates.stream()
+                .map(a -> TreeNode.child(a.toTree()))
+                .toList();
+        return TreeNode.of("agregados", aggregates.size() + " función(es)", "list", children);
     }
 }

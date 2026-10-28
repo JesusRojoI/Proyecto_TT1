@@ -44,12 +44,18 @@ class TranslationServiceTest {
     }
 
     @Test
-    void funcionesTrigonometricas() throws Exception {
-        Map<String, Object> r = run("π(nombre, sin(edad), cos(edad))(Estudiantes)");
+    void funcionesMatematicas() throws Exception {
+        Map<String, Object> r = run("π(nombre, sqrt(edad), abs(edad))(Estudiantes)");
         assertEquals("success", r.get("status"));
         String sql = (String) r.get("sql");
-        assertTrue(sql.contains("SIN(edad)"));
-        assertTrue(sql.contains("COS(edad)"));
+        assertTrue(sql.contains("SQRT(edad)"));
+        assertTrue(sql.contains("ABS(edad)"));
+    }
+
+    @Test
+    void funcionesTrigonometricasYaNoFormanParteDelLenguaje() throws Exception {
+        Map<String, Object> r = run("π(nombre, sin(edad))(Estudiantes)");
+        assertEquals("error", r.get("status"));
     }
 
     @Test
@@ -106,6 +112,8 @@ class TranslationServiceTest {
         assertEquals("SIN-01", r.get("errorCode"));
         assertNotNull(r.get("message"));
         assertNotNull(r.get("expected"));
+        assertEquals(11, r.get("position"));
+        assertEquals(10, r.get("offset"));
     }
 
     @Test
@@ -123,10 +131,22 @@ class TranslationServiceTest {
     }
 
     @Test
-    void generaArbolSintactico() throws Exception {
+    void generaArbolSintacticoVisual() throws Exception {
         Map<String, Object> r = run("π(nombre)(Estudiantes)");
         assertTrue(((String) r.get("tree")).contains("Proyeccion"));
         assertTrue(((String) r.get("tree")).contains("Tabla: Estudiantes"));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> tree = (Map<String, Object>) r.get("treeData");
+        assertNotNull(tree);
+        assertEquals("π", tree.get("label"));
+        assertNotNull(tree.get("children"));
+
+        String dot = (String) r.get("treeDot");
+        assertNotNull(dot);
+        assertTrue(dot.startsWith("digraph ArbolSintactico"));
+        assertTrue(dot.contains("N00001"));
+        assertTrue(dot.contains("rankdir=TB"));
     }
 
     @Test

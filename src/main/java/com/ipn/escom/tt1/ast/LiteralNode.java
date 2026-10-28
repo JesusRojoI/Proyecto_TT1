@@ -1,5 +1,7 @@
 package com.ipn.escom.tt1.ast;
 
+import java.util.Map;
+
 /**
  * Literal escalar: número, cadena de texto o valor lógico ({@code TRUE},
  * {@code FALSE}, {@code NULL}). El valor se guarda ya listo para SQL.
@@ -38,5 +40,14 @@ public class LiteralNode extends ScalarExpression {
     @Override
     public String toTreeString(int level) {
         return "  ".repeat(level) + kind + ": " + value + "\n";
+    }
+
+    @Override
+    public Map<String, Object> toTree() {
+        return TreeNode.leaf(value, switch (kind) {
+            case "NUMERO" -> "Número";
+            case "CADENA" -> "Cadena";
+            default -> "Lógico";
+        }, "literal");
     }
 }

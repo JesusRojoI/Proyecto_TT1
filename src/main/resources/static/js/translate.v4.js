@@ -1,5 +1,6 @@
 /* =============================================================
-   Traducción de álgebra relacional a SQL, tokenización, errores y resultados.
+   Traducción de álgebra relacional a SQL, tokenización, errores,
+   resultados y preparación del diagrama con Graphviz.
    ============================================================= */
 
 const Translate = (() => {
@@ -20,7 +21,8 @@ const Translate = (() => {
         }
         let html = '';
         tokens.forEach(t => {
-            html += '<span class="token-chip" title="' + escapeHtml(t.description || '') + ' (línea ' + t.line + ', columna ' + t.column + ')">' +
+            html += '<span class="token-chip" title="' + escapeHtml(t.description || '') +
+                ' (línea ' + t.line + ', columna ' + t.column + ')">' +
                 '<span class="token-lexeme">' + escapeHtml(t.lexeme) + '</span>' +
                 '<span class="token-type">' + escapeHtml(t.type) + '</span>' +
                 '</span>';
@@ -35,7 +37,14 @@ const Translate = (() => {
         if (data.detail) {
             html += '<p class="mt-1 text-red-700">' + escapeHtml(data.detail) + '</p>';
         }
-        if (data.line && data.line > 0) {
+        if (Number.isInteger(data.position)) {
+            let location = '';
+            if (data.line && data.line > 0) {
+                location = ' · línea ' + data.line + (data.column ? ', columna ' + data.column : '');
+            }
+            html += '<p class="error-position mt-2"><i class="bi bi-cursor-text"></i> ' +
+                'Posición del error: carácter <strong>' + data.position + '</strong>' + location + '</p>';
+        } else if (data.line && data.line > 0) {
             html += '<p class="mt-1 text-red-700"><i class="bi bi-geo-alt"></i> Línea ' + data.line +
                 (data.column ? ', columna ' + data.column : '') + '</p>';
         }
@@ -47,15 +56,16 @@ const Translate = (() => {
     }
 
     function clearError() {
-        el('errorBox').classList.add('hidden');
-        el('errorBox').innerHTML = '';
+        const box = el('errorBox');
+        box.classList.add('hidden');
+        box.innerHTML = '';
     }
 
     function renderTable(execution) {
         const container = el('resultTableContainer');
         const execInfo = el('execInfo');
         if (!execution) {
-            container.innerHTML = '<span class="text-slate-500">Sin ejecución (conecta una base de datos para ejecutar la consulta).</span>';
+            container.innerHTML = '<span class="text-slate-500">Sin ejecución: conecta una base de datos para ejecutar la consulta.</span>';
             execInfo.textContent = '';
             return;
         }
@@ -88,70 +98,70 @@ const Translate = (() => {
     }
 
     async function run() {
-        const expression = Editor.getValue().trim();
+        const rawExpression = Editor.getValue();
+        const expression = rawExpression.trim();
         if (!expression) {
+            clearError();
+            Editor.clearMarkers();
             Editor.focus();
             return;
         }
         lastExpression = expression;
         clearError();
+        Editor.clearMarkers();
         el('sqlEquivOutput').textContent = 'Procesando...';
-        el('arEquivOutput').textContent = expression;
-        el('treeOutput').textContent = 'Procesando...';
-        el('expandedOutput').textContent = 'Procesando...';
+        const copyButton = el('copySqlBtn');
+        if (copyButton) copyButton.disabled = true;
+        if (typeof TreeView !== 'undefined') TreeView.clear('Generando diagrama...');
         el('tokensContainer').innerHTML = '<span class="text-slate-400 text-sm">Tokenizando...</span>';
         el('resultTableContainer').innerHTML = '<span class="text-slate-500">Procesando...</span>';
         el('execInfo').textContent = '';
 
         try {
-            const data = await API.translate(expression, Connection.getDatabase());
+            const data = await API.translate(rawExpression, Connection.getDatabase());
             renderTokens(data.tokens);
 
             if (data.status === 'success') {
                 el('sqlEquivOutput').textContent = data.sql || '--';
-                el('treeOutput').textContent = data.tree || '--';
-                el('expandedOutput').textContent = data.expanded || data.sql || '--';
-                el('historyKeys').textContent = (data.saved ? data.saved + ' guardado. ' : '') +
-                    (data.historyKeys && data.historyKeys.length ? data.historyKeys : 'vacío');
+                if (copyButton) copyButton.disabled = false;
+                if (typeof TreeView !== 'undefined') TreeView.setTree(data.treeDot, data.treeData);
                 renderTable(data.execution);
             } else {
                 renderError(data);
+                if (Number.isInteger(data.offset)) {
+                    Editor.showError(data.offset, data.errorLength, data.message || 'Error de análisis');
+                }
+                if (typeof TreeView !== 'undefined') TreeView.clear('La expresión no pudo analizarse.');
                 el('sqlEquivOutput').textContent = '--';
-                el('treeOutput').textContent = 'La expresión no pudo analizarse.';
-                el('expandedOutput').textContent = '--';
-                el('historyKeys').textContent = (data.historyKeys && data.historyKeys.length) ? data.historyKeys : 'vacío';
                 el('resultTableContainer').innerHTML = '<span class="text-red-700 text-xs">No se pudo ejecutar.</span>';
             }
         } catch (error) {
             renderError({ message: 'Error de conexión: ' + error.message });
+            if (typeof TreeView !== 'undefined') TreeView.clear('Error de conexión.');
             el('sqlEquivOutput').textContent = '--';
-            el('treeOutput').textContent = 'Error de conexión.';
-            el('expandedOutput').textContent = '--';
             el('resultTableContainer').innerHTML = '<span class="text-red-700 text-xs">Error de conexión.</span>';
         }
     }
 
-    async function save() {
-        if (!lastExpression) { alert('Primero traduce una expresión.'); return; }
-        const suggested = '@' + (Math.floor(Math.random() * 90) + 10);
-        const varName = prompt('Nombre de la variable (ej. @1):', suggested);
-        if (!varName) return;
-        if (!/^@[0-9]+$/.test(varName.trim())) {
-            alert('La variable debe tener el formato @n (por ejemplo @1).');
-            return;
-        }
-        Editor.setValue(varName.trim() + ' <- ' + lastExpression);
-        await run();
-    }
-
-    async function clearHistory() {
-        if (!confirm('¿Limpiar todo el historial de variables?')) return;
-        const data = await API.clearHistory();
-        el('historyKeys').textContent = 'vacío';
-        alert(data.message);
-    }
-
     function getLast() { return lastExpression; }
 
-    return { run, save, clearHistory, getLast, setExpression: (v) => Editor.setValue(v) };
+    async function copySql() {
+        const text = el('sqlEquivOutput').textContent || '';
+        if (!text || text === '--' || text === 'Procesando...') return;
+        try {
+            await navigator.clipboard.writeText(text);
+            const button = el('copySqlBtn');
+            if (button) {
+                const original = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check2"></i> Copiado';
+                window.setTimeout(() => { button.innerHTML = original; }, 1600);
+            }
+        } catch (e) {
+            const box = el('errorBox');
+            box.classList.remove('hidden');
+            box.innerHTML = '<p class="font-semibold">No se pudo copiar el SQL al portapapeles.</p>';
+        }
+    }
+
+    return { run, copySql, getLast, setExpression: (v) => Editor.setValue(v) };
 })();
