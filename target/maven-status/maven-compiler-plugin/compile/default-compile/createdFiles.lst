@@ -5,8 +5,8 @@ com/ipn/escom/tt1/ast/VariableNode.class
 com/ipn/escom/tt1/ast/FunctionNode.class
 com/ipn/escom/tt1/ast/SelectNode.class
 com/ipn/escom/tt1/service/DatabaseService$ConnectionProfile.class
-com/ipn/escom/tt1/ast/Expression.class
 com/ipn/escom/tt1/ast/LogicalNode.class
+com/ipn/escom/tt1/ast/Expression.class
 com/ipn/escom/tt1/ast/TableNode.class
 com/ipn/escom/tt1/parser/LexicalException.class
 com/ipn/escom/tt1/parser/SyntaxException.class
@@ -24,6 +24,6 @@ com/ipn/escom/tt1/ast/AggregateList.class
 com/ipn/escom/tt1/Tt1AlgebraRelacionalApplication.class
 com/ipn/escom/tt1/ast/UnaryNode.class
 com/ipn/escom/tt1/ast/ScalarExpression.class
-com/ipn/escom/tt1/ast/AggregateExpression.class
 com/ipn/escom/tt1/ast/ArithNode.class
+com/ipn/escom/tt1/ast/AggregateExpression.class
 com/ipn/escom/tt1/service/DatabaseService.class
