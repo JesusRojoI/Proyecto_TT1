@@ -3,6 +3,7 @@ package com.ipn.escom.tt1.service;
 import com.ipn.escom.tt1.ast.AssignNode;
 import com.ipn.escom.tt1.ast.DotTreeBuilder;
 import com.ipn.escom.tt1.ast.Expression;
+import com.ipn.escom.tt1.ast.SyntaxNode;
 import com.ipn.escom.tt1.parser.Lexer;
 import com.ipn.escom.tt1.parser.LexicalException;
 import com.ipn.escom.tt1.parser.SyntaxException;
@@ -100,15 +101,17 @@ public class TranslationService {
             history.put(saved, new HistoryEntry(expandedBody, snapshot));
         }
 
-        /* El árbol debe mostrar la relación completa: si hubo asignación se
-           conserva esa etiqueta, pero su cuerpo ya contiene las variables
-           sustituidas por las relaciones guardadas. */
+        /* El árbol que se dibuja es el árbol de sintaxis concreto de la
+           expresión capturada. El AST expandido se conserva para el SQL y el
+           desglose de variables. */
         Expression treeAst = saved != null ? new AssignNode(saved, expandedBody) : expandedBody;
-        Map<String, Object> treeData = treeAst.toTree();
+        SyntaxNode syntax = ast.getSyntax();
+        Map<String, Object> treeData = syntax != null ? syntax.toTree() : treeAst.toTree();
+        String treeText = syntax != null ? syntax.toTreeString(0) : treeAst.toTreeString(0);
 
         response.put("status", "success");
         response.put("sql", expandedBody.asQuery());
-        response.put("tree", treeAst.toTreeString(0));
+        response.put("tree", treeText);
         response.put("treeData", treeData);
         response.put("treeDot", DotTreeBuilder.build(treeData));
         response.put("tokens", tokens);

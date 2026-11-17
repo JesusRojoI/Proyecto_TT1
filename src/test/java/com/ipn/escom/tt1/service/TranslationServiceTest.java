@@ -133,14 +133,23 @@ class TranslationServiceTest {
     @Test
     void generaArbolSintacticoVisual() throws Exception {
         Map<String, Object> r = run("π(nombre)(Estudiantes)");
-        assertTrue(((String) r.get("tree")).contains("Proyeccion"));
-        assertTrue(((String) r.get("tree")).contains("Tabla: Estudiantes"));
+        String treeText = (String) r.get("tree");
+        assertTrue(treeText.startsWith("ListExprAlgRel"));
+        assertTrue(treeText.contains("Relacion"));
+        assertTrue(treeText.contains("PROY"));
+        assertTrue(treeText.contains("ListaAtributos"));
+        assertTrue(treeText.contains("ATRIBUTO"));
+        assertTrue(treeText.contains("TABLA.Estudiantes"));
 
         @SuppressWarnings("unchecked")
         Map<String, Object> tree = (Map<String, Object>) r.get("treeData");
         assertNotNull(tree);
-        assertEquals("π", tree.get("label"));
+        assertEquals("ListExprAlgRel", tree.get("label"));
+        assertEquals("nonterminal", tree.get("category"));
         assertNotNull(tree.get("children"));
+        assertTrue(containsLabel(tree, "TABLA.Estudiantes"));
+        assertTrue(containsCategory(tree, "nonterminal"));
+        assertTrue(containsCategory(tree, "attribute"));
 
         String dot = (String) r.get("treeDot");
         assertNotNull(dot);
@@ -148,11 +157,77 @@ class TranslationServiceTest {
         assertTrue(dot.contains("N00001"));
         assertTrue(dot.contains("rankdir=LR"));
         assertTrue(dot.contains("shape=ellipse"));
-        assertTrue(dot.contains("Columna de tabla"));
-        assertTrue(dot.contains("Tabla del esquema"));
+        assertTrue(dot.contains("PROY"));
+        assertTrue(dot.contains("ListaAtributos"));
+        assertTrue(dot.contains("ATRIBUTO"));
+        assertTrue(dot.contains("TABLA.Estudiantes"));
 
         String selectDot = (String) run("σ(nombre == 'Ana')(Estudiantes)").get("treeDot");
-        assertTrue(selectDot.contains("Filtra filas"));
+        assertTrue(selectDot.contains("SELEC"));
+        assertTrue(selectDot.contains("expr_bool"));
+        assertTrue(selectDot.contains("=="));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void generaElArbolDeSintaxisConcretoDelEjemplo() throws Exception {
+        String expression =
+                "Π(R.a,R.b,R.c,R.d ; ⋈(σ(R;R.a<R.b && R.x==R.y);Y;Y.a>=R.u));";
+        Map<String, Object> r = run(expression);
+        assertEquals("success", r.get("status"), String.valueOf(r.get("message")));
+
+        String tree = (String) r.get("tree");
+        assertTrue(tree.startsWith("ListExprAlgRel"));
+        assertTrue(tree.contains("Relacion"));
+        assertTrue(tree.contains("PROY"));
+        assertTrue(tree.contains("ListaAtributos"));
+        assertTrue(tree.contains("JOIN"));
+        assertTrue(tree.contains("SELEC"));
+        assertTrue(tree.contains("TABLA.R"));
+        assertTrue(tree.contains("TABLA.Y"));
+        assertTrue(tree.contains("expr_bool"));
+        assertTrue(tree.contains("Condicion"));
+        assertTrue(tree.contains("ATRIBUTO [R.a]"));
+        assertTrue(tree.contains("ATRIBUTO [R.u]"));
+        assertTrue(tree.contains("&&"));
+        assertTrue(tree.contains(">="));
+
+        Map<String, Object> treeData = (Map<String, Object>) r.get("treeData");
+        assertTrue(containsLabel(treeData, "ListExprAlgRel"));
+        assertTrue(containsLabel(treeData, "TABLA.R"));
+        assertTrue(containsLabel(treeData, "TABLA.Y"));
+        assertTrue(containsCategory(treeData, "attribute"));
+        assertTrue(containsCategory(treeData, "table"));
+        assertTrue(containsCategory(treeData, "nonterminal"));
+
+        String dot = (String) r.get("treeDot");
+        assertTrue(dot.contains("TABLA.R"));
+        assertTrue(dot.contains("TABLA.Y"));
+        assertTrue(dot.contains("expr_bool"));
+        assertTrue(dot.contains("Condicion"));
+
+        String sql = (String) r.get("sql");
+        assertTrue(sql.contains("SELECT R.a, R.b, R.c, R.d"));
+        assertTrue(sql.contains("R.a < R.b"));
+        assertTrue(sql.contains("R.x = R.y"));
+        assertTrue(sql.contains("Y.a >= R.u"));
+    }
+
+    @Test
+    void aceptaLasFormasConPuntoYComaDelEjemplo() throws Exception {
+        Map<String, Object> select = run("σ(R; R.a < R.b)");
+        assertEquals("success", select.get("status"));
+        assertTrue(((String) select.get("tree")).contains("SELEC"));
+        assertTrue(((String) select.get("tree")).contains("TABLA.R"));
+
+        Map<String, Object> join = run("⋈(R; Y; R.a == Y.a)");
+        assertEquals("success", join.get("status"));
+        assertTrue(((String) join.get("tree")).contains("JOIN"));
+        assertTrue(((String) join.get("tree")).contains("Condicion"));
+
+        Map<String, Object> project = run("Π(R.a; R)");
+        assertEquals("success", project.get("status"));
+        assertTrue(((String) project.get("tree")).contains("PROY"));
     }
 
     @Test
@@ -202,9 +277,10 @@ class TranslationServiceTest {
         assertTrue(((String) breakdown.get(0).get("sql")).contains("SELECT nombre FROM Estudiantes"));
 
         Map<String, Object> tree = (Map<String, Object>) r.get("treeData");
-        assertFalse(containsCategory(tree, "variable"));
-        assertTrue(containsCategory(tree, "table"));
-        assertTrue(containsCategory(tree, "select"));
+        assertTrue(containsCategory(tree, "variable"));
+        assertFalse(containsCategory(tree, "table"));
+        assertTrue(containsLabel(tree, "SELEC"));
+        assertTrue(containsLabel(tree, "ListExprAlgRel"));
 
         String sql = (String) r.get("sql");
         assertTrue(sql.contains("SELECT nombre FROM Estudiantes"));
@@ -263,6 +339,25 @@ class TranslationServiceTest {
                     Object rawNode = wrapper.get("node");
                     if (rawNode instanceof Map<?, ?> childNode
                             && containsCategory((Map<String, Object>) childNode, category)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean containsLabel(Map<String, Object> node, String label) {
+        if (node == null) return false;
+        if (label.equals(node.get("label"))) return true;
+        Object children = node.get("children");
+        if (children instanceof List<?> list) {
+            for (Object child : list) {
+                if (child instanceof Map<?, ?> wrapper) {
+                    Object rawNode = wrapper.get("node");
+                    if (rawNode instanceof Map<?, ?> childNode
+                            && containsLabel((Map<String, Object>) childNode, label)) {
                         return true;
                     }
                 }

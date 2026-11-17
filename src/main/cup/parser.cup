@@ -9,6 +9,12 @@ import java.util.*;
    Basada en la propuesta de GramAlgRel.cup del profesor, ampliada con
    funciones matemáticas, comparadores de signo, literales de cadena,
    comentarios y los símbolos unicode de los operadores.
+
+   Además de construir el AST que se traduce a SQL, cada producción arma
+   el árbol de sintaxis concreto (CST) que se dibuja con Graphviz. El CST
+   conserva los no terminales de la gramática (ListExprAlgRel, Relacion,
+   ListaAtributos, expr_bool, Condicion, ...) y los terminales que
+   intervienen en la expresión.
    ============================================================= */
 
 parser code {:
@@ -64,6 +70,23 @@ parser code {:
         }
         return new AttributeNode(q.substring(0, dot), q.substring(dot + 1));
     }
+
+    /* Helpers para construir el árbol de sintaxis concreto. */
+    private static SyntaxNode nt(String label, SyntaxNode... children) {
+        return SyntaxNode.nonterminal(label, children);
+    }
+
+    private static SyntaxNode t(String label) {
+        return SyntaxNode.terminal(label);
+    }
+
+    private static SyntaxNode t(String label, String detail, String category) {
+        return SyntaxNode.terminal(label, detail, category);
+    }
+
+    private static SyntaxNode attribute(String text) {
+        return t("ATRIBUTO", text, SyntaxNode.ATTRIBUTE);
+    }
 :}
 
 init with {: :};
@@ -91,11 +114,12 @@ terminal String FUNCTION;
 /* ------------------------ No terminales ----------------------- */
 non terminal Expression program;
 non terminal Expression relation;
+non terminal Expression complexRelation;
 non terminal ExpressionList attrList;
 non terminal AggregateList aggList;
 non terminal AggregateExpression agg;
 non terminal ScalarExpression expr;
-non terminal ArrayList argList;
+non terminal ArgumentList argList;
 
 /* ------------------------ Precedencias ------------------------ */
 precedence left OR;
@@ -111,113 +135,314 @@ precedence right UMINUS;
 
 start with program;
 
-program ::= relation:r SEMICOLON   {: RESULT = r; :}
-          | relation:r             {: RESULT = r; :}
+program ::= relation:r SEMICOLON
+                {: r.setSyntax(nt("ListExprAlgRel", r.getSyntax(), t(";"))); RESULT = r; :}
+          | relation:r
+                {: r.setSyntax(nt("ListExprAlgRel", r.getSyntax())); RESULT = r; :}
           ;
 
 /* ---------------------- Relaciones ---------------------------- */
-relation ::= SELECT LPAREN expr:c RPAREN LPAREN relation:s RPAREN
-                {: RESULT = new SelectNode(c, s); :}
-           | SELECT LPAREN expr:c COMMA relation:s RPAREN
-                {: RESULT = new SelectNode(c, s); :}
-           | PROJECT LPAREN attrList:a RPAREN LPAREN relation:s RPAREN
-                {: RESULT = new ProjectNode(a, s); :}
-           | PROJECT LPAREN attrList:a SEMICOLON relation:s RPAREN
-                {: RESULT = new ProjectNode(a, s); :}
-           | GROUP LPAREN attrList:a SEMICOLON aggList:g RPAREN LPAREN relation:s RPAREN
-                {: RESULT = new GroupNode(a, g, s); :}
-           | GROUP LPAREN attrList:a SEMICOLON aggList:g SEMICOLON relation:s RPAREN
-                {: RESULT = new GroupNode(a, g, s); :}
-           | JOIN LPAREN relation:l COMMA relation:r RPAREN
-                {: RESULT = new JoinNode(l, r, null); :}
-           | JOIN LPAREN relation:l COMMA relation:r COMMA expr:c RPAREN
-                {: RESULT = new JoinNode(l, r, c); :}
-           | UNION LPAREN relation:l COMMA relation:r RPAREN
-                {: RESULT = new BinaryOpNode("UNION", l, r); :}
-           | INTERSEC LPAREN relation:l COMMA relation:r RPAREN
-                {: RESULT = new BinaryOpNode("INTERSECT", l, r); :}
-           | DIFFERENCE LPAREN relation:l COMMA relation:r RPAREN
-                {: RESULT = new BinaryOpNode("DIFFERENCE", l, r); :}
-           | PRODUCT LPAREN relation:l COMMA relation:r RPAREN
-                {: RESULT = new BinaryOpNode("PRODUCT", l, r); :}
-           | VARIABLE:v ASSIGN relation:r
-                {: RESULT = new AssignNode(v, r); :}
-           | VARIABLE:v
-                {: RESULT = new VariableNode(v); :}
-           | IDENTIFIER:t
-                {: RESULT = new TableNode(t); :}
+/* Las producciones que comienzan con una palabra reservada se agrupan en
+   complexRelation. Así la forma σ(Relacion;Condicion) puede aceptar tanto una
+   tabla simple (IDENTIFIER) como una relación compuesta (π, ⋈, γ, ...) sin
+   crear conflictos con las condiciones que empiezan con un atributo. */
+relation ::= IDENTIFIER:name
+                {: TableNode n = new TableNode(name);
+                   n.setSyntax(nt("Relacion", t("TABLA." + name, name, SyntaxNode.TABLE)));
+                   RESULT = n; :}
            | LPAREN relation:r RPAREN
-                {: RESULT = r; :}
+                {: SyntaxNode inner = r.getSyntax();
+                   r.setSyntax(nt("Relacion", t("("), inner, t(")")));
+                   RESULT = r; :}
+           | complexRelation:c
+                {: RESULT = c; :}
            | relation:l UNION relation:r
-                {: RESULT = new BinaryOpNode("UNION", l, r); :}
+                {: BinaryOpNode n = new BinaryOpNode("UNION", l, r);
+                   n.setSyntax(nt("Relacion", l.getSyntax(), t("UNION"), r.getSyntax()));
+                   RESULT = n; :}
            | relation:l INTERSEC relation:r
-                {: RESULT = new BinaryOpNode("INTERSECT", l, r); :}
+                {: BinaryOpNode n = new BinaryOpNode("INTERSECT", l, r);
+                   n.setSyntax(nt("Relacion", l.getSyntax(), t("INTERSEC"), r.getSyntax()));
+                   RESULT = n; :}
            | relation:l DIFFERENCE relation:r
-                {: RESULT = new BinaryOpNode("DIFFERENCE", l, r); :}
+                {: BinaryOpNode n = new BinaryOpNode("DIFFERENCE", l, r);
+                   n.setSyntax(nt("Relacion", l.getSyntax(), t("DIF"), r.getSyntax()));
+                   RESULT = n; :}
            | relation:l MINUS relation:r
-                {: RESULT = new BinaryOpNode("DIFFERENCE", l, r); :}
+                {: BinaryOpNode n = new BinaryOpNode("DIFFERENCE", l, r);
+                   n.setSyntax(nt("Relacion", l.getSyntax(), t("DIF"), r.getSyntax()));
+                   RESULT = n; :}
            | relation:l PRODUCT relation:r
-                {: RESULT = new BinaryOpNode("PRODUCT", l, r); :}
+                {: BinaryOpNode n = new BinaryOpNode("PRODUCT", l, r);
+                   n.setSyntax(nt("Relacion", l.getSyntax(), t("PRODCART"), r.getSyntax()));
+                   RESULT = n; :}
            | relation:l TIMES relation:r
-                {: RESULT = new BinaryOpNode("PRODUCT", l, r); :}
+                {: BinaryOpNode n = new BinaryOpNode("PRODUCT", l, r);
+                   n.setSyntax(nt("Relacion", l.getSyntax(), t("PRODCART"), r.getSyntax()));
+                   RESULT = n; :}
            | relation:l JOIN relation:r
-                {: RESULT = new JoinNode(l, r, null); :}
+                {: JoinNode n = new JoinNode(l, r, null);
+                   n.setSyntax(nt("Relacion", l.getSyntax(), t("JOIN"), r.getSyntax()));
+                   RESULT = n; :}
+           ;
+
+complexRelation ::= SELECT LPAREN expr:c RPAREN LPAREN relation:s RPAREN
+                {: SelectNode n = new SelectNode(c, s);
+                   n.setSyntax(nt("Relacion", t("SELEC"), t("("), c.getSyntax(), t(")"),
+                                   t("("), s.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | SELECT LPAREN expr:c COMMA relation:s RPAREN
+                {: SelectNode n = new SelectNode(c, s);
+                   n.setSyntax(nt("Relacion", t("SELEC"), t("("), c.getSyntax(), t(","),
+                                   s.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | SELECT LPAREN IDENTIFIER:name SEMICOLON expr:c RPAREN
+                {: TableNode source = new TableNode(name);
+                   source.setSyntax(nt("Relacion", t("TABLA." + name, name, SyntaxNode.TABLE)));
+                   SelectNode n = new SelectNode(c, source);
+                   n.setSyntax(nt("Relacion", t("SELEC"), t("("), source.getSyntax(), t(";"),
+                                   c.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | SELECT LPAREN complexRelation:s SEMICOLON expr:c RPAREN
+                {: SelectNode n = new SelectNode(c, s);
+                   n.setSyntax(nt("Relacion", t("SELEC"), t("("), s.getSyntax(), t(";"),
+                                   c.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | PROJECT LPAREN attrList:a RPAREN LPAREN relation:s RPAREN
+                {: ProjectNode n = new ProjectNode(a, s);
+                   n.setSyntax(nt("Relacion", t("PROY"), t("("), a.getSyntax(), t(")"),
+                                   t("("), s.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | PROJECT LPAREN attrList:a SEMICOLON relation:s RPAREN
+                {: ProjectNode n = new ProjectNode(a, s);
+                   n.setSyntax(nt("Relacion", t("PROY"), t("("), a.getSyntax(), t(";"),
+                                   s.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | GROUP LPAREN attrList:a SEMICOLON aggList:g RPAREN LPAREN relation:s RPAREN
+                {: GroupNode n = new GroupNode(a, g, s);
+                   n.setSyntax(nt("Relacion", t("AGRUPAR"), t("("), a.getSyntax(), t(";"),
+                                   g.getSyntax(), t(")"), t("("), s.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | GROUP LPAREN attrList:a SEMICOLON aggList:g SEMICOLON relation:s RPAREN
+                {: GroupNode n = new GroupNode(a, g, s);
+                   n.setSyntax(nt("Relacion", t("AGRUPAR"), t("("), a.getSyntax(), t(";"),
+                                   g.getSyntax(), t(";"), s.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | JOIN LPAREN relation:l COMMA relation:r RPAREN
+                {: JoinNode n = new JoinNode(l, r, null);
+                   n.setSyntax(nt("Relacion", t("JOIN"), t("("), l.getSyntax(), t(","),
+                                   r.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | JOIN LPAREN relation:l COMMA relation:r COMMA expr:c RPAREN
+                {: JoinNode n = new JoinNode(l, r, c);
+                   n.setSyntax(nt("Relacion", t("JOIN"), t("("), l.getSyntax(), t(","),
+                                   r.getSyntax(), t(","), nt("Condicion", c.getSyntax()),
+                                   t(")")));
+                   RESULT = n; :}
+           | JOIN LPAREN relation:l SEMICOLON relation:r RPAREN
+                {: JoinNode n = new JoinNode(l, r, null);
+                   n.setSyntax(nt("Relacion", t("JOIN"), t("("), l.getSyntax(), t(";"),
+                                   r.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | JOIN LPAREN relation:l SEMICOLON relation:r SEMICOLON expr:c RPAREN
+                {: JoinNode n = new JoinNode(l, r, c);
+                   n.setSyntax(nt("Relacion", t("JOIN"), t("("), l.getSyntax(), t(";"),
+                                   r.getSyntax(), t(";"), nt("Condicion", c.getSyntax()),
+                                   t(")")));
+                   RESULT = n; :}
+           | UNION LPAREN relation:l COMMA relation:r RPAREN
+                {: BinaryOpNode n = new BinaryOpNode("UNION", l, r);
+                   n.setSyntax(nt("Relacion", t("UNION"), t("("), l.getSyntax(), t(","),
+                                   r.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | INTERSEC LPAREN relation:l COMMA relation:r RPAREN
+                {: BinaryOpNode n = new BinaryOpNode("INTERSECT", l, r);
+                   n.setSyntax(nt("Relacion", t("INTERSEC"), t("("), l.getSyntax(), t(","),
+                                   r.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | DIFFERENCE LPAREN relation:l COMMA relation:r RPAREN
+                {: BinaryOpNode n = new BinaryOpNode("DIFFERENCE", l, r);
+                   n.setSyntax(nt("Relacion", t("DIF"), t("("), l.getSyntax(), t(","),
+                                   r.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | PRODUCT LPAREN relation:l COMMA relation:r RPAREN
+                {: BinaryOpNode n = new BinaryOpNode("PRODUCT", l, r);
+                   n.setSyntax(nt("Relacion", t("PRODCART"), t("("), l.getSyntax(), t(","),
+                                   r.getSyntax(), t(")")));
+                   RESULT = n; :}
+           | VARIABLE:v ASSIGN relation:r
+                {: AssignNode n = new AssignNode(v, r);
+                   n.setSyntax(nt("Relacion", t(v, "variable", SyntaxNode.VARIABLE), t("<-"),
+                                   r.getSyntax()));
+                   RESULT = n; :}
+           | VARIABLE:v
+                {: VariableNode n = new VariableNode(v);
+                   n.setSyntax(nt("Relacion", t(v, "variable", SyntaxNode.VARIABLE)));
+                   RESULT = n; :}
            ;
 
 /* ---------------- Lista de atributos/expresiones -------------- */
 attrList ::= expr:e
-                {: RESULT = new ExpressionList(e); :}
+                {: ExpressionList l = new ExpressionList(e);
+                   l.setSyntax(nt("ListaAtributos", e.getSyntax()));
+                   RESULT = l; :}
            | attrList:a COMMA expr:e
-                {: RESULT = a.add(e); :}
+                {: SyntaxNode previous = a.getSyntax();
+                   ExpressionList l = a.add(e);
+                   l.setSyntax(nt("ListaAtributos", previous, t(","), e.getSyntax()));
+                   RESULT = l; :}
            ;
 
 /* ---------------- Lista de funciones de agregación ------------ */
 aggList ::= agg:a
-                {: RESULT = new AggregateList(a); :}
+                {: AggregateList l = new AggregateList(a);
+                   l.setSyntax(nt("ListaAgregados", a.getSyntax()));
+                   RESULT = l; :}
           | aggList:l COMMA agg:a
-                {: RESULT = l.add(a); :}
+                {: SyntaxNode previous = l.getSyntax();
+                   AggregateList updated = l.add(a);
+                   updated.setSyntax(nt("ListaAgregados", previous, t(","), a.getSyntax()));
+                   RESULT = updated; :}
           ;
 
-agg ::= SUM LPAREN expr:e RPAREN   {: RESULT = new AggregateExpression("SUM", e, false); :}
-      | AVG LPAREN expr:e RPAREN   {: RESULT = new AggregateExpression("AVG", e, false); :}
-      | MAX LPAREN expr:e RPAREN   {: RESULT = new AggregateExpression("MAX", e, false); :}
-      | MIN LPAREN expr:e RPAREN   {: RESULT = new AggregateExpression("MIN", e, false); :}
-      | COUNT LPAREN expr:e RPAREN {: RESULT = new AggregateExpression("COUNT", e, false); :}
-      | COUNT LPAREN TIMES RPAREN  {: RESULT = new AggregateExpression("COUNT", null, true); :}
+agg ::= SUM LPAREN expr:e RPAREN
+            {: AggregateExpression a = new AggregateExpression("SUM", e, false);
+               a.setSyntax(nt("func_agregacion", t("SUM"), t("("), e.getSyntax(), t(")")));
+               RESULT = a; :}
+      | AVG LPAREN expr:e RPAREN
+            {: AggregateExpression a = new AggregateExpression("AVG", e, false);
+               a.setSyntax(nt("func_agregacion", t("AVG"), t("("), e.getSyntax(), t(")")));
+               RESULT = a; :}
+      | MAX LPAREN expr:e RPAREN
+            {: AggregateExpression a = new AggregateExpression("MAX", e, false);
+               a.setSyntax(nt("func_agregacion", t("MAX"), t("("), e.getSyntax(), t(")")));
+               RESULT = a; :}
+      | MIN LPAREN expr:e RPAREN
+            {: AggregateExpression a = new AggregateExpression("MIN", e, false);
+               a.setSyntax(nt("func_agregacion", t("MIN"), t("("), e.getSyntax(), t(")")));
+               RESULT = a; :}
+      | COUNT LPAREN expr:e RPAREN
+            {: AggregateExpression a = new AggregateExpression("COUNT", e, false);
+               a.setSyntax(nt("func_agregacion", t("COUNT"), t("("), e.getSyntax(), t(")")));
+               RESULT = a; :}
+      | COUNT LPAREN TIMES RPAREN
+            {: AggregateExpression a = new AggregateExpression("COUNT", null, true);
+               a.setSyntax(nt("func_agregacion", t("COUNT"), t("("), t("*"), t(")")));
+               RESULT = a; :}
       ;
 
 /* ------------------- Expresiones escalares -------------------- */
-expr ::= expr:l PLUS expr:r    {: RESULT = new ArithNode("+", l, r); :}
-       | expr:l MINUS expr:r   {: RESULT = new ArithNode("-", l, r); :}
-       | expr:l TIMES expr:r   {: RESULT = new ArithNode("*", l, r); :}
-       | expr:l DIVIDE expr:r  {: RESULT = new ArithNode("/", l, r); :}
-       | expr:l POWER expr:r   {: RESULT = new ArithNode("^", l, r); :}
-       | MINUS expr:e {: RESULT = new UnaryNode("-", e); :} %prec UMINUS
-       | expr:l EQ expr:r      {: RESULT = new CompareNode("==", l, r); :}
-       | expr:l NE expr:r      {: RESULT = new CompareNode("!=", l, r); :}
-       | expr:l GT expr:r      {: RESULT = new CompareNode(">", l, r); :}
-       | expr:l GE expr:r      {: RESULT = new CompareNode(">=", l, r); :}
-       | expr:l LT expr:r      {: RESULT = new CompareNode("<", l, r); :}
-       | expr:l LE expr:r      {: RESULT = new CompareNode("<=", l, r); :}
-       | expr:l AND expr:r     {: RESULT = new LogicalNode("AND", l, r); :}
-       | expr:l OR expr:r      {: RESULT = new LogicalNode("OR", l, r); :}
-       | NOT expr:e            {: RESULT = new UnaryNode("NOT", e); :}
-       | LPAREN expr:e RPAREN  {: RESULT = e; :}
+expr ::= expr:l PLUS expr:r
+            {: ArithNode n = new ArithNode("+", l, r);
+               n.setSyntax(nt("expr", l.getSyntax(), t("+"), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l MINUS expr:r
+            {: ArithNode n = new ArithNode("-", l, r);
+               n.setSyntax(nt("expr", l.getSyntax(), t("-"), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l TIMES expr:r
+            {: ArithNode n = new ArithNode("*", l, r);
+               n.setSyntax(nt("expr", l.getSyntax(), t("*"), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l DIVIDE expr:r
+            {: ArithNode n = new ArithNode("/", l, r);
+               n.setSyntax(nt("expr", l.getSyntax(), t("/"), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l POWER expr:r
+            {: ArithNode n = new ArithNode("^", l, r);
+               n.setSyntax(nt("expr", l.getSyntax(), t("^"), r.getSyntax()));
+               RESULT = n; :}
+       | MINUS expr:e
+            {: UnaryNode n = new UnaryNode("-", e);
+               n.setSyntax(nt("expr", t("-"), e.getSyntax()));
+               RESULT = n; :} %prec UMINUS
+       | expr:l EQ expr:r
+            {: CompareNode n = new CompareNode("==", l, r);
+               n.setSyntax(nt("expr_bool", l.getSyntax(), t("=="), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l NE expr:r
+            {: CompareNode n = new CompareNode("!=", l, r);
+               n.setSyntax(nt("expr_bool", l.getSyntax(), t("!="), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l GT expr:r
+            {: CompareNode n = new CompareNode(">", l, r);
+               n.setSyntax(nt("expr_bool", l.getSyntax(), t(">"), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l GE expr:r
+            {: CompareNode n = new CompareNode(">=", l, r);
+               n.setSyntax(nt("expr_bool", l.getSyntax(), t(">="), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l LT expr:r
+            {: CompareNode n = new CompareNode("<", l, r);
+               n.setSyntax(nt("expr_bool", l.getSyntax(), t("<"), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l LE expr:r
+            {: CompareNode n = new CompareNode("<=", l, r);
+               n.setSyntax(nt("expr_bool", l.getSyntax(), t("<="), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l AND expr:r
+            {: LogicalNode n = new LogicalNode("AND", l, r);
+               n.setSyntax(nt("expr_bool", l.getSyntax(), t("&&"), r.getSyntax()));
+               RESULT = n; :}
+       | expr:l OR expr:r
+            {: LogicalNode n = new LogicalNode("OR", l, r);
+               n.setSyntax(nt("expr_bool", l.getSyntax(), t("||"), r.getSyntax()));
+               RESULT = n; :}
+       | NOT expr:e
+            {: UnaryNode n = new UnaryNode("NOT", e);
+               n.setSyntax(nt("expr_bool", t("!"), e.getSyntax()));
+               RESULT = n; :}
+       | LPAREN expr:e RPAREN
+            {: SyntaxNode inner = e.getSyntax();
+               e.setSyntax(nt("expr", t("("), inner, t(")")));
+               RESULT = e; :}
        | FUNCTION:f LPAREN RPAREN
-                {: RESULT = new FunctionNode(f, new ArrayList<ScalarExpression>()); :}
+            {: FunctionNode n = new FunctionNode(f, new ArrayList<ScalarExpression>());
+               n.setSyntax(nt("expr", t("FUNCION", f, SyntaxNode.FUNCTION), t("("), t(")")));
+               RESULT = n; :}
        | FUNCTION:f LPAREN argList:args RPAREN
-                {: RESULT = new FunctionNode(f, args); :}
-       | NUMBER:n          {: RESULT = LiteralNode.number(n); :}
-       | STRING:s          {: RESULT = LiteralNode.text(s); :}
-       | TRUE              {: RESULT = LiteralNode.keyword("TRUE"); :}
-       | FALSE             {: RESULT = LiteralNode.keyword("FALSE"); :}
-       | NULL              {: RESULT = LiteralNode.keyword("NULL"); :}
-       | IDENTIFIER:a      {: RESULT = new AttributeNode(a); :}
-       | QUALIFIED:q       {: RESULT = qualified(q); :}
+            {: FunctionNode n = new FunctionNode(f, args);
+               n.setSyntax(nt("expr", t("FUNCION", f, SyntaxNode.FUNCTION), t("("),
+                               args.getSyntax(), t(")")));
+               RESULT = n; :}
+       | NUMBER:n
+            {: LiteralNode node = LiteralNode.number(n);
+               node.setSyntax(nt("expr", t("NUMERO", n, SyntaxNode.LITERAL)));
+               RESULT = node; :}
+       | STRING:s
+            {: LiteralNode node = LiteralNode.text(s);
+               node.setSyntax(nt("expr", t("CADENA", s, SyntaxNode.LITERAL)));
+               RESULT = node; :}
+       | TRUE
+            {: LiteralNode node = LiteralNode.keyword("TRUE");
+               node.setSyntax(nt("expr", t("LOGICO", "TRUE", SyntaxNode.LITERAL)));
+               RESULT = node; :}
+       | FALSE
+            {: LiteralNode node = LiteralNode.keyword("FALSE");
+               node.setSyntax(nt("expr", t("LOGICO", "FALSE", SyntaxNode.LITERAL)));
+               RESULT = node; :}
+       | NULL
+            {: LiteralNode node = LiteralNode.keyword("NULL");
+               node.setSyntax(nt("expr", t("LOGICO", "NULL", SyntaxNode.LITERAL)));
+               RESULT = node; :}
+       | IDENTIFIER:a
+            {: AttributeNode node = new AttributeNode(a);
+               node.setSyntax(nt("expr", attribute(a)));
+               RESULT = node; :}
+       | QUALIFIED:q
+            {: ScalarExpression node = qualified(q);
+               node.setSyntax(nt("expr", attribute(q)));
+               RESULT = node; :}
        ;
 
 argList ::= expr:e
-                {: ArrayList l = new ArrayList(); l.add(e); RESULT = l; :}
+                {: ArgumentList l = new ArgumentList();
+                   l.add(e);
+                   l.setSyntax(nt("ListaArgumentos", e.getSyntax()));
+                   RESULT = l; :}
           | argList:l COMMA expr:e
-                {: l.add(e); RESULT = l; :}
+                {: SyntaxNode previous = l.getSyntax();
+                   l.add(e);
+                   l.setSyntax(nt("ListaArgumentos", previous, t(","), e.getSyntax()));
+                   RESULT = l; :}
           ;

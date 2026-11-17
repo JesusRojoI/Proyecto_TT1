@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Genera la representación DOT (Graphviz) del árbol sintáctico a partir de la
- * estructura que expone cada nodo del AST. El diagrama se dibuja de izquierda
- * (raíz) a derecha (hojas), con nodos elípticos, y cada nodo recibe un
- * identificador único con el formato N00001, N00002, etc., tal como se describe
- * en la documentación del proyecto.
+ * Genera la representación DOT (Graphviz) del árbol de sintaxis concreto
+ * producido por la gramática. El diagrama se dibuja de izquierda (raíz) a
+ * derecha (hojas), con nodos elípticos, y cada nodo recibe un identificador
+ * único con el formato N00001, N00002, etc.
  *
- * <p>Los nodos usan un relleno suave con texto oscuro y borde de color, de modo
- * que el diagrama conserve la paleta institucional sin perder legibilidad.</p>
+ * <p>Los no terminales ({@code Relacion}, {@code ListaAtributos},
+ * {@code expr_bool}, ...) y los terminales ({@code PROY}, {@code (},
+ * {@code ;}, {@code TABLA.R}, ...) usan estilos distintos para facilitar la
+ * lectura de la derivación.</p>
  */
 public final class DotTreeBuilder {
 
@@ -20,21 +21,24 @@ public final class DotTreeBuilder {
     }
 
     private static final Map<String, Style> STYLES = Map.ofEntries(
+            Map.entry("nonterminal", new Style("#e0f2fe", "#0284c7", "#075985")),
+            Map.entry("terminal", new Style("#f8fafc", "#94a3b8", "#334155")),
+            Map.entry("operator", new Style("#ede9fe", "#8b5cf6", "#5b21b6")),
+            Map.entry("table", new Style("#fef3c7", "#f59e0b", "#92400e")),
+            Map.entry("attribute", new Style("#ccfbf1", "#14b8a6", "#115e59")),
+            Map.entry("literal", new Style("#dcfce7", "#22c55e", "#166534")),
+            Map.entry("variable", new Style("#fef9c3", "#eab308", "#713f12")),
+            Map.entry("function", new Style("#d1fae5", "#10b981", "#065f46")),
+            Map.entry("aggregate", new Style("#f3e8ff", "#a855f7", "#6b21a8")),
             Map.entry("select", new Style("#dbeafe", "#3b82f6", "#1e3a8a")),
             Map.entry("project", new Style("#ccfbf1", "#14b8a6", "#115e59")),
             Map.entry("join", new Style("#e0e7ff", "#6366f1", "#3730a3")),
             Map.entry("set", new Style("#cffafe", "#0891b2", "#155e75")),
             Map.entry("group", new Style("#fef3c7", "#f59e0b", "#92400e")),
-            Map.entry("aggregate", new Style("#f3e8ff", "#a855f7", "#6b21a8")),
             Map.entry("compare", new Style("#ffe4e6", "#fb7185", "#9f1239")),
             Map.entry("logic", new Style("#fce7f3", "#ec4899", "#9d174d")),
             Map.entry("arith", new Style("#ffedd5", "#fb923c", "#9a3412")),
-            Map.entry("function", new Style("#d1fae5", "#10b981", "#065f46")),
-            Map.entry("table", new Style("#cbd5e1", "#475569", "#0f172a")),
-            Map.entry("attribute", new Style("#e2e8f0", "#94a3b8", "#1e293b")),
-            Map.entry("literal", new Style("#dcfce7", "#22c55e", "#166534")),
             Map.entry("assign", new Style("#fef3c7", "#d97706", "#78350f")),
-            Map.entry("variable", new Style("#fef9c3", "#eab308", "#713f12")),
             Map.entry("list", new Style("#f1f5f9", "#94a3b8", "#334155"))
     );
 

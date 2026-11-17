@@ -8,6 +8,13 @@ import java.util.Map;
  */
 public abstract class Expression {
 
+    /** Subárbol concreto de la producción que originó este nodo (lo llena CUP). */
+    private SyntaxNode syntax;
+
+    public SyntaxNode getSyntax() { return syntax; }
+
+    public void setSyntax(SyntaxNode syntax) { this.syntax = syntax; }
+
     public abstract String toSQL();
 
     public abstract String toTreeString(int level);

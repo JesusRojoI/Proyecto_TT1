@@ -1,8 +1,8 @@
 # Árboles sintácticos del proyecto
 
 Esta carpeta contiene **28 árboles de sintaxis** producidos por el analizador
-sintáctico del proyecto (gramática `src/main/cup/parser.cup` y nodos AST de
-`com.ipn.escom.tt1.ast`). Cada árbol se entrega como imagen independiente:
+sintáctico del proyecto (gramática `src/main/cup/parser.cup`). Cada árbol se
+entrega como imagen independiente:
 
 - `png/`: imagen rasterizada a 2× para insertar en documentos o diapositivas.
 - `svg/`: versión vectorial, escalable sin pérdida.
@@ -41,5 +41,10 @@ Abre `index.html` en el navegador para recorrer la colección completa.
 | `27-literales.png` | Literales (número, cadena, lógico, nulo) | `σ(edad > 5 && activo == TRUE && nombre != NULL && ciudad == "CDMX")(Estudiantes)` |
 | `28-atributo-cualificado.png` | Atributo cualificado (tabla.atributo) | `σ(Estudiantes.edad > Inscripciones.edad)(JOIN(Estudiantes, Inscripciones, Estudiantes.matricula == Inscripciones.matricula))` |
 
-> Las imágenes se generaron a partir de la salida real del parser (`Expression.toTree()`),
-> por lo que la estructura mostrada corresponde exactamente a la que produce el sistema.
+> Las imágenes de esta galería son material de referencia generado con una
+> presentación anterior del árbol. La interfaz actual dibuja el **árbol de
+> sintaxis concreto** (`SyntaxNode`), que conserva los no terminales de la
+> gramática (`Relacion`, `ListaAtributos`, `expr_bool`, `Condicion`, ...) y los
+> terminales (`PROY`, `SELEC`, `(`, `;`, `TABLA.R`, `ATRIBUTO`, ...). Para ver
+> el árbol vigente de una expresión, ejecuta la aplicación y usa el panel de
+> visualización.

@@ -56,7 +56,7 @@ mvn spring-boot:run
 
 ```text
 src/main/java/com/ipn/escom/tt1/
-  ast/         Nodos del AST y generación del formato DOT para Graphviz
+  ast/         Nodos del AST, árbol de sintaxis concreto (CST) y formato DOT
   controller/  Endpoints REST de conexión, traducción y manual
   parser/      Excepciones y clases generadas por JFlex/CUP
   service/     Lógica de traducción y acceso a MySQL
@@ -71,6 +71,33 @@ src/main/resources/static/
   css/                Estilos institucionales
 scripts/              Scripts SQL de prueba
 docs/                 Árboles sintácticos de referencia
+```
+
+## Árbol de sintaxis
+
+La interfaz dibuja el **árbol de sintaxis concreto** que produce la gramática:
+conserva los no terminales (`ListExprAlgRel`, `Relacion`, `ListaAtributos`,
+`expr_bool`, `Condicion`, ...) y los terminales de la expresión (`PROY`,
+`SELEC`, `JOIN`, `(`, `)`, `,`, `;`, `&&`, `TABLA.R`, `ATRIBUTO`, ...). El AST
+se sigue usando internamente para traducir a SQL y expandir las variables de
+historial.
+
+Por ejemplo, para `Π(R.a,R.b ; ⋈(σ(R;R.a<R.b);Y;Y.a>=R.u));` el árbol comienza
+así:
+
+```text
+ListExprAlgRel
+  Relacion
+    PROY
+    (
+    ListaAtributos
+      ATRIBUTO [R.a]
+      ,
+      ATRIBUTO [R.b]
+    ;
+    Relacion
+      JOIN
+      ...
 ```
 
 ## Pruebas

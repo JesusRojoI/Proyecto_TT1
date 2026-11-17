@@ -24,21 +24,24 @@ const TreeView = (() => {
        explicación de una línea. Así la leyenda explica qué hace cada nodo en
        lugar de repetir una etiqueta genérica. */
     const legendMeta = {
+        nonterminal: { symbol: 'N', label: 'No terminal', hint: 'regla de la gramática', fill: '#e0f2fe', border: '#0284c7', ink: '#075985' },
+        terminal: { symbol: 't', label: 'Terminal', hint: 'símbolo de la expresión', fill: '#f8fafc', border: '#94a3b8', ink: '#334155' },
+        operator: { symbol: '±', label: 'Operador', hint: 'comparación o conectiva', fill: '#ede9fe', border: '#8b5cf6', ink: '#5b21b6' },
+        table: { symbol: '▦', label: 'Relación base', hint: 'tabla del esquema', fill: '#fef3c7', border: '#f59e0b', ink: '#92400e' },
+        attribute: { symbol: '▯', label: 'Atributo', hint: 'columna de tabla', fill: '#ccfbf1', border: '#14b8a6', ink: '#115e59' },
+        literal: { symbol: '#', label: 'Literal', hint: 'valor constante', fill: '#dcfce7', border: '#22c55e', ink: '#166534' },
+        variable: { symbol: 'x', label: 'Variable', hint: 'referencia previa', fill: '#fef9c3', border: '#eab308', ink: '#713f12' },
+        function: { symbol: 'ƒ', label: 'Función', hint: 'transforma valores', fill: '#d1fae5', border: '#10b981', ink: '#065f46' },
+        aggregate: { symbol: '∑', label: 'Agregación', hint: 'resume valores', fill: '#f3e8ff', border: '#a855f7', ink: '#6b21a8' },
         select: { symbol: 'σ', label: 'Selección', hint: 'filtra filas', fill: '#dbeafe', border: '#3b82f6', ink: '#1e3a8a' },
         project: { symbol: 'π', label: 'Proyección', hint: 'elige columnas', fill: '#ccfbf1', border: '#14b8a6', ink: '#115e59' },
         join: { symbol: '⋈', label: 'Reunión', hint: 'combina relaciones', fill: '#e0e7ff', border: '#6366f1', ink: '#3730a3' },
         set: { symbol: '∪', label: 'Conjuntos', hint: 'une o resta filas', fill: '#cffafe', border: '#0891b2', ink: '#155e75' },
         group: { symbol: 'γ', label: 'Agrupación', hint: 'forma grupos', fill: '#fef3c7', border: '#f59e0b', ink: '#92400e' },
-        aggregate: { symbol: '∑', label: 'Agregación', hint: 'resume valores', fill: '#f3e8ff', border: '#a855f7', ink: '#6b21a8' },
         compare: { symbol: '≥', label: 'Comparación', hint: 'contrasta valores', fill: '#ffe4e6', border: '#fb7185', ink: '#9f1239' },
         logic: { symbol: '∧', label: 'Conectiva', hint: 'une condiciones', fill: '#fce7f3', border: '#ec4899', ink: '#9d174d' },
         arith: { symbol: '±', label: 'Aritmética', hint: 'calcula números', fill: '#ffedd5', border: '#fb923c', ink: '#9a3412' },
-        function: { symbol: 'ƒ', label: 'Función', hint: 'transforma valores', fill: '#d1fae5', border: '#10b981', ink: '#065f46' },
-        table: { symbol: '▦', label: 'Relación base', hint: 'tabla del esquema', fill: '#cbd5e1', border: '#475569', ink: '#0f172a' },
-        attribute: { symbol: '▯', label: 'Atributo', hint: 'columna de tabla', fill: '#e2e8f0', border: '#94a3b8', ink: '#1e293b' },
-        literal: { symbol: '#', label: 'Literal', hint: 'valor constante', fill: '#dcfce7', border: '#22c55e', ink: '#166534' },
         assign: { symbol: '←', label: 'Asignación', hint: 'guarda resultado', fill: '#fef3c7', border: '#d97706', ink: '#78350f' },
-        variable: { symbol: 'x', label: 'Variable', hint: 'referencia previa', fill: '#fef9c3', border: '#eab308', ink: '#713f12' },
         list: { symbol: '≡', label: 'Lista', hint: 'varios elementos', fill: '#f1f5f9', border: '#94a3b8', ink: '#334155' }
     };
 

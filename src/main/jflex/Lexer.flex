@@ -46,10 +46,12 @@ Number         = {Digit}+("."{Digit}+)?([eE][+-]?{Digit}+)?
 /* ---------- Operadores relacionales (simbolos unicode) ---------- */
 "σ"                 { return symbol(sym.SELECT, yytext()); }
 "π"                 { return symbol(sym.PROJECT, yytext()); }
+"Π"                 { return symbol(sym.PROJECT, yytext()); }
 "⋈"                 { return symbol(sym.JOIN, yytext()); }
 "∪"                 { return symbol(sym.UNION, yytext()); }
 "∩"                 { return symbol(sym.INTERSEC, yytext()); }
 "γ"                 { return symbol(sym.GROUP, yytext()); }
+"Γ"                 { return symbol(sym.GROUP, yytext()); }
 "Σ"                 { return symbol(sym.SUM, yytext()); }
 
 /* ---------- Operadores relacionales (palabras) ---------- */
